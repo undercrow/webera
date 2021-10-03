@@ -6,6 +6,7 @@ import type {FunctionComponent} from "preact";
 import {useRef, useState} from "preact/hooks";
 import {createUseStyles} from "react-jss";
 
+import * as era from "../era";
 import CheckCircle from "../components/svg/CheckCircle";
 import Sync from "../components/svg/Sync";
 import {Slot} from "../slot";
@@ -76,7 +77,7 @@ type Props = {
 };
 
 const NewSlot: FunctionComponent<Props> = (props) => {
-	const {className} = props;
+	const {className, onCreate} = props;
 	const styles = useStyles();
 	const [name, setName] = useState("");
 	const [error, setError] = useState<string | null>(null);
@@ -100,7 +101,9 @@ const NewSlot: FunctionComponent<Props> = (props) => {
 
 			const buffer = await file.arrayBuffer();
 			const zip = await loadAsync(buffer);
-			console.log(zip);
+			const hash = await era.hash(zip);
+			setError(null);
+			onCreate?.({name, hash});
 		} catch (e) {
 			setError((e as Error).message);
 		}

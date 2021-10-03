@@ -72,9 +72,10 @@ const Root: FunctionComponent = () => {
 				<h1 className={styles.title}>WebEra v2021.10.01</h1>
 				<h2 className={styles.subtitle}>eraJS v0.1.0</h2>
 				<ul className={styles.slotList}>
-					{slots.map(([slot], i) => (
+					{slots.map(([slot, setSlot], i) => (
 						<li className={styles.slot}>
 							<SlotComponent
+								onCreate={(s) => setSlot(s)}
 								onSelect={() => setSelected(i)}
 								selected={i === selected}
 								slot={slot}

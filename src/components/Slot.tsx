@@ -8,19 +8,20 @@ import ValidSlot from "../components/ValidSlot";
 import {Slot} from "../slot";
 
 type Props = {
+	onCreate?: (slot: Slot) => void;
 	onSelect?: () => void;
 	selected: boolean;
 	slot: Slot | null;
 };
 
 const SlotComponent: FunctionComponent<Props> = (props) => {
-	const {onSelect, selected, slot} = props;
+	const {onCreate, onSelect, selected, slot} = props;
 
 	if (slot != null) {
 		return <ValidSlot slot={slot} />;
 	} else {
 		if (selected) {
-			return <NewSlot />;
+			return <NewSlot onCreate={onCreate} />;
 		} else {
 			return <EmptySlot onClick={onSelect} />;
 		}
