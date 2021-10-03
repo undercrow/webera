@@ -4,7 +4,7 @@ import {createAction, createReducer} from "typesafe-actions";
 
 import Channel from "../channel";
 import type {State as RootState, ThunkAction} from "./index";
-import {pushNewline, pushString} from "./log";
+import {pushLine, pushNewline, pushString} from "./log";
 
 export type State = {
 	vm?: era.VM;
@@ -71,6 +71,9 @@ export function startVM(): ThunkAction<void> {
 					break;
 				}
 				case "line": {
+					dispatch(pushLine({
+						value: next.value.value,
+					}));
 					break;
 				}
 				case "clearline": {

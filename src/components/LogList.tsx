@@ -12,6 +12,7 @@ import * as sx from "../style-util";
 const useStyles = createUseStyles({
 	root: {
 		...sx.vflex,
+		alignItems: "stretch",
 		fontSize: 16,
 	},
 });
