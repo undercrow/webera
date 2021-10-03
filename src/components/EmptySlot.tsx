@@ -5,7 +5,6 @@ import type {FunctionComponent} from "preact";
 import {createUseStyles} from "react-jss";
 
 import AddBox from "../components/svg/AddBox";
-import {Slot} from "../slot";
 
 const useStyles = createUseStyles({
 	root: {
@@ -14,30 +13,25 @@ const useStyles = createUseStyles({
 		alignItems: "center",
 		justifyContent: "center",
 		padding: "1em",
-		border: "1px solid white",
+		fontSize: 16,
 		cursor: "pointer",
-
-		"&:hover": {
-			backgroundColor: "#222222",
-		},
 	},
 	text: {
 		marginTop: "0.5em",
-		fontSize: 16,
 	},
 });
 
 type Props = {
 	className?: string;
-	onCreate?: (slot: Slot) => void;
+	onClick?: () => void;
 };
 
 const EmptySlot: FunctionComponent<Props> = (props) => {
-	const {className} = props;
+	const {className, onClick} = props;
 	const styles = useStyles();
 
 	return (
-		<div className={classNames([styles.root, className])}>
+		<div className={classNames([styles.root, className])} onClick={onClick}>
 			<AddBox color="white" size={48} />
 			<span className={styles.text}>Empty Slot</span>
 		</div>
