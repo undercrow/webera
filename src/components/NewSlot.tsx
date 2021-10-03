@@ -24,9 +24,6 @@ const useStyles = createUseStyles({
 		padding: "1em",
 		fontSize: 16,
 	},
-	icon: {
-		cursor: "pointer",
-	},
 	spin: {
 		animation: "$spin 2s linear infinite",
 	},
@@ -36,7 +33,7 @@ const useStyles = createUseStyles({
 		alignItems: "flex-start",
 		justifyContent: "center",
 		width: "100%",
-		marginLeft: "0.5em",
+		marginRight: "0.5em",
 	},
 	label: {
 		display: "flex",
@@ -68,6 +65,9 @@ const useStyles = createUseStyles({
 	error: {
 		fontSize: 14,
 		color: "red",
+	},
+	icon: {
+		cursor: "pointer",
 	},
 });
 
@@ -112,10 +112,6 @@ const NewSlot: FunctionComponent<Props> = (props) => {
 
 	return (
 		<div className={classNames([styles.root, className])}>
-			{isSubmitting ?
-				<Sync className={classNames(styles.icon, styles.spin)} color="white" size={48} /> :
-				<CheckCircle className={styles.icon} color="white" size={48} onClick={onSubmit} />
-			}
 			<div className={styles.body}>
 				<label className={styles.label}>
 					Name:
@@ -135,6 +131,10 @@ const NewSlot: FunctionComponent<Props> = (props) => {
 					null
 				}
 			</div>
+			{isSubmitting ?
+				<Sync className={classNames(styles.icon, styles.spin)} color="white" size={48} /> :
+				<CheckCircle className={styles.icon} color="white" size={48} onClick={onSubmit} />
+			}
 		</div>
 	);
 };

@@ -13,11 +13,13 @@ const useStyles = createUseStyles({
 		justifyContent: "flex-start",
 		padding: "1em",
 		fontSize: 16,
-		cursor: "pointer",
 	},
 	text: {
 		width: "100%",
-		marginLeft: "0.5em",
+		marginRight: "0.5em",
+	},
+	icon: {
+		cursor: "pointer",
 	},
 });
 
@@ -32,8 +34,8 @@ const EmptySlot: FunctionComponent<Props> = (props) => {
 
 	return (
 		<div className={classNames([styles.root, className])} onClick={onClick}>
-			<AddBox color="white" size={48} />
 			<span className={styles.text}>Empty Slot</span>
+			<AddBox className={styles.icon} color="white" size={48} />
 		</div>
 	);
 };

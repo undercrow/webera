@@ -50,7 +50,7 @@ const useStyles = createUseStyles({
 		border: "1px solid white",
 
 		"&:hover": {
-			backgroundColor: "#222222",
+			backgroundColor: "#0B0B0B",
 		},
 	},
 });
