@@ -12,6 +12,7 @@
 	},
 	"dependencies": {
 		"classnames": "^2.3.1",
+		"jszip": "^3.7.1",
 		"preact": "^10.5.14",
 		"react-jss": "^10.8.0",
 		"react-redux": "^7.2.5",

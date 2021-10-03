@@ -10,16 +10,16 @@ type Props = {
 };
 
 /* eslint-disable max-len */
-const AddBox: FunctionComponent<Props> = (props) => {
+const Sync: FunctionComponent<Props> = (props) => {
 	const {className, color, onClick} = props;
 	const size = props.size ?? 24;
 
 	return (
 		<svg viewBox="0 0 24 24" fill={color} class={className} width={size} height={size} onClick={onClick}>
-			<path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-8-2h2v-4h4v-2h-4V7h-2v4H7v2h4z"/>
+			<path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
 		</svg>
 	);
 };
 /* eslint-enable max-len */
 
-export default AddBox;
+export default Sync;
