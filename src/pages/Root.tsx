@@ -29,6 +29,7 @@ const useStyles = createUseStyles({
 		lineHeight: "1.5em",
 	},
 	subtitle: {
+		marginBottom: "1em",
 		fontSize: 24,
 		fontWeight: "normal",
 		lineHeight: "1.5em",
@@ -37,11 +38,10 @@ const useStyles = createUseStyles({
 		display: "flex",
 		alignItems: "center",
 		justifyContent: "center",
-
-		"& > li": {
-			marginLeft: "0.5rem",
-			marginRight: "0.5rem",
-		},
+	},
+	slot: {
+		marginLeft: "0.5rem",
+		marginRight: "0.5rem",
 	},
 });
 
@@ -53,19 +53,20 @@ const Root: FunctionComponent = () => {
 		useLocalStorage<Slot | null>("slot-2", null),
 		useLocalStorage<Slot | null>("slot-3", null),
 		useLocalStorage<Slot | null>("slot-4", null),
-		useLocalStorage<Slot | null>("slot-5", null),
-		useLocalStorage<Slot | null>("slot-6", null),
 	];
 
 	return (
-		<div class={styles.root}>
-			<div class={styles.body}>
-				<h1 class={styles.title}>WebEra v2021.10.01</h1>
-				<h2 class={styles.subtitle}>eraJS v0.1.0</h2>
-				<ul class={styles.slotList}>
+		<div className={styles.root}>
+			<div className={styles.body}>
+				<h1 className={styles.title}>WebEra v2021.10.01</h1>
+				<h2 className={styles.subtitle}>eraJS v0.1.0</h2>
+				<ul className={styles.slotList}>
 					{slots.map(([slot]) => (
-						<li>
-							{slot != null ? <ValidSlot slot={slot} /> : <EmptySlot />}
+						<li className={styles.slot}>
+							{slot != null ?
+								<ValidSlot slot={slot} /> :
+								<EmptySlot />
+							}
 						</li>
 					))}
 				</ul>
