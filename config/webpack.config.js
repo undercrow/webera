@@ -103,5 +103,7 @@ module.exports = {
 		}),
 	],
 	devtool: onDev("eval-source-map"),
-	devServer: {},
+	devServer: {
+		historyApiFallback: true
+	},
 };

@@ -2,6 +2,7 @@ import {h} from "preact";
 
 import {render} from "preact";
 import {Provider as ReduxProvider} from "react-redux";
+import {BrowserRouter as Router} from "react-router-dom";
 
 import "./reset.css";
 
@@ -10,6 +11,8 @@ import App from "./App";
 
 render((
 	<ReduxProvider store={store}>
-		<App />
+		<Router>
+			<App />
+		</Router>
 	</ReduxProvider>
 ), document.getElementById("root")!);
