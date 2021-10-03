@@ -1,12 +1,10 @@
 import {h} from "preact";
 
-import type {FunctionComponent, ComponentChild} from "preact";
+import type {FunctionComponent} from "preact";
 import {useState} from "preact/hooks";
 import {createUseStyles} from "react-jss";
 
-import EmptySlot from "../components/EmptySlot";
-import NewSlot from "../components/NewSlot";
-import ValidSlot from "../components/ValidSlot";
+import SlotComponent from "../components/Slot";
 import {useLocalStorage} from "../hooks";
 import {Slot} from "../slot";
 
@@ -70,19 +68,15 @@ const Root: FunctionComponent = () => {
 				<h1 className={styles.title}>WebEra v2021.10.01</h1>
 				<h2 className={styles.subtitle}>eraJS v0.1.0</h2>
 				<ul className={styles.slotList}>
-					{slots.map(([slot], i) => {
-						let content: ComponentChild;
-						if (slot != null) {
-							content = <ValidSlot slot={slot} />;
-						} else {
-							if (selected === i) {
-								content = <NewSlot />;
-							} else {
-								content = <EmptySlot onClick={() => setSelected(i)} />;
-							}
-						}
-						return <li className={styles.slot}>{content}</li>;
-					})}
+					{slots.map(([slot], i) => (
+						<li className={styles.slot}>
+							<SlotComponent
+								onSelect={() => setSelected(i)}
+								selected={i === selected}
+								slot={slot}
+							/>
+						</li>
+					))}
 				</ul>
 			</div>
 		</div>
