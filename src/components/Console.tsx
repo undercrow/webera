@@ -6,6 +6,7 @@ import {useEffect, useRef, useState} from "preact/hooks";
 import {createUseStyles} from "react-jss";
 
 import {useDispatch} from "../store";
+import {refreshTextified} from "../store/log";
 import {pushInput} from "../store/vm";
 import * as sx from "../style-util";
 
@@ -48,6 +49,7 @@ const Console: FunctionComponent<Props> = (props) => {
 	const [value, setValue] = useState("");
 	const onSubmit = (event: Event) => {
 		event.preventDefault();
+		dispatch(refreshTextified());
 		dispatch(pushInput(value));
 		setValue("");
 	};

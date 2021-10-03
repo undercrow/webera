@@ -7,7 +7,7 @@ import {createUseStyles} from "react-jss";
 
 import Block from "../components/Block";
 import {useSelector} from "../store";
-import {selectBlocks} from "../store/log";
+import {selectBlocks, selectTextified} from "../store/log";
 import * as sx from "../style-util";
 
 const useStyles = createUseStyles({
@@ -28,6 +28,7 @@ const LogList: FunctionComponent<Props> = (props) => {
 	const {className} = props;
 	const styles = useStyles();
 	const blocks = useSelector(selectBlocks);
+	const textified = useSelector(selectTextified);
 	const bodyRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -37,7 +38,7 @@ const LogList: FunctionComponent<Props> = (props) => {
 
 	return (
 		<div className={classNames([styles.root, className])} ref={bodyRef}>
-			{blocks.map((block) => <Block block={block} />)}
+			{blocks.map((block, i) => <Block textified={textified >= i} block={block} />)}
 		</div>
 	);
 };

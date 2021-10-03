@@ -18,20 +18,21 @@ const useStyles = createUseStyles({
 });
 
 type Props = {
+	textified: boolean;
 	block: Block;
 };
 
 const BlockComponent: FunctionComponent<Props> = (props) => {
-	const {block} = props;
+	const {block, textified} = props;
 	const styles = useStyles();
 
 	return (
 		<div className={styles.root}>
 			{block.chunks.map((chunk) => {
 				switch (chunk.type) {
-					case "button": return <ButtonChunk chunk={chunk} />;
+					case "button": return <ButtonChunk chunk={chunk} textified={textified} />;
 					case "line": return <LineChunk chunk={chunk} />;
-					case "string": return <StringChunk chunk={chunk} />;
+					case "string": return <StringChunk chunk={chunk} textified={textified} />;
 				}
 			})}
 		</div>

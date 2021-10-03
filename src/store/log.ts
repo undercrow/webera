@@ -6,6 +6,7 @@ import {createSubReducer, State as RootState} from "./index";
 
 export type State = {
 	blocks: Block[];
+	textified: number;
 };
 
 const initial: State = {
@@ -15,22 +16,29 @@ const initial: State = {
 			align: "LEFT",
 		},
 	],
+	textified: -1,
 };
 
 export const selector = (state: RootState): State => state.log;
 export const selectBlocks = createSelector(selector, (state) => state.blocks);
+export const selectTextified = createSelector(selector, (state) => state.textified);
 
+export const refreshTextified = createAction("LOG/BLOCK/TEXTIFY/REFRESH")();
 export const pushNewline = createAction("LOG/BLOCK/PUSH/NEWLINE")();
 export const pushButton = createAction("LOG/BLOCK/PUSH/BUTTON")<Omit<ButtonChunk, "type">>();
 export const pushLine = createAction("LOG/BLOCK/PUSH/LINE")<Omit<LineChunk, "type">>();
 export const pushString = createAction("LOG/BLOCK/PUSH/STRING")<Omit<StringChunk, "type">>();
 
 export type Action =
+	| ReturnType<typeof refreshTextified>
 	| ReturnType<typeof pushNewline>
 	| ReturnType<typeof pushButton>
 	| ReturnType<typeof pushLine>
 	| ReturnType<typeof pushString>;
 export const reducer = createReducer<State, Action>(initial, {
+	"LOG/BLOCK/TEXTIFY/REFRESH": createSubReducer((state) => {
+		state.textified = state.blocks.length - 1;
+	}),
 	"LOG/BLOCK/PUSH/NEWLINE": createSubReducer((state) => {
 		const align = state.blocks[state.blocks.length - 1].align;
 		state.blocks.push({

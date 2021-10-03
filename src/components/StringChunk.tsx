@@ -62,23 +62,28 @@ const useStyles = createUseStyles({
 });
 
 type Props = {
+	textified: boolean;
 	chunk: StringChunk;
 };
 
 const StringChunkComponent: FunctionComponent<Props> = (props) => {
-	const {chunk} = props;
+	const {chunk, textified} = props;
 	const styles = useStyles();
 
-	return (
-		<Fragment>
-			{parseChunk(chunk).map((c) => {
-				switch (c.type) {
-					case "button": return <ButtonChunkComponent chunk={c} />;
-					case "string": return <span className={styles.root}>{c.text}</span>;
-				}
-			})}
-		</Fragment>
-	);
+	if (textified) {
+		return <span className={styles.root}>{chunk.text}</span>;
+	} else {
+		return (
+			<Fragment>
+				{parseChunk(chunk).map((c) => {
+					switch (c.type) {
+						case "button": return <ButtonChunkComponent chunk={c} />;
+						case "string": return <span className={styles.root}>{c.text}</span>;
+					}
+				})}
+			</Fragment>
+		);
+	}
 };
 
 export default StringChunkComponent;
