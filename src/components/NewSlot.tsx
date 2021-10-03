@@ -5,22 +5,34 @@ import type {FunctionComponent} from "preact";
 import {useRef, useState} from "preact/hooks";
 import {createUseStyles} from "react-jss";
 
+import AddBox from "../components/svg/AddBox";
 import {Slot} from "../slot";
 
 const useStyles = createUseStyles({
 	root: {
 		display: "flex",
-		flexDirection: "column",
 		alignItems: "center",
-		justifyContent: "center",
+		justifyContent: "flex-start",
 		padding: "1em",
 		fontSize: 16,
-		cursor: "pointer",
+	},
+	body: {
+		display: "flex",
+		flexDirection: "column",
+		alignItems: "flex-start",
+		justifyContent: "center",
+		width: "100%",
+		marginLeft: "0.5em",
 	},
 	label: {
 		display: "flex",
 		alignItems: "center",
 		justifyContent: "center",
+		width: "100%",
+
+		"& + &": {
+			marginTop: "0.5em",
+		},
 	},
 	nameInput: {
 		width: "100%",
@@ -36,7 +48,7 @@ const useStyles = createUseStyles({
 	},
 	fileInput: {
 		width: "100%",
-		marginLeft: "0.5em",
+		marginLeft: "2em",
 
 		"&:focus": {
 			outline: "none",
@@ -57,19 +69,22 @@ const NewSlot: FunctionComponent<Props> = (props) => {
 
 	return (
 		<div className={classNames([styles.root, className])}>
-			<label className={styles.label}>
-				Name:
-				<input
-					className={styles.nameInput}
-					type="text"
-					value={name}
-					onChange={(e) => setName((e.target as HTMLInputElement).value)}
-				/>
-			</label>
-			<label className={styles.label}>
-				File:
-				<input className={styles.fileInput} type="file" ref={fileRef} />
-			</label>
+			<AddBox color="white" size={48} />
+			<div className={styles.body}>
+				<label className={styles.label}>
+					Name:
+					<input
+						className={styles.nameInput}
+						type="text"
+						value={name}
+						onChange={(e) => setName((e.target as HTMLInputElement).value)}
+					/>
+				</label>
+				<label className={styles.label}>
+					File:
+					<input className={styles.fileInput} type="file" ref={fileRef} />
+				</label>
+			</div>
 		</div>
 	);
 };

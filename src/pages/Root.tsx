@@ -36,13 +36,17 @@ const useStyles = createUseStyles({
 	},
 	slotList: {
 		display: "flex",
+		flexDirection: "column",
 		alignItems: "center",
 		justifyContent: "center",
+		width: "100%",
+		paddingLeft: "10rem",
+		paddingRight: "10rem",
 	},
 	slot: {
-		width: "12rem",
-		marginLeft: "0.5rem",
-		marginRight: "0.5rem",
+		width: "100%",
+		maxWidth: "30rem",
+		marginBottom: "0.5rem",
 		border: "1px solid white",
 
 		"&:hover": {

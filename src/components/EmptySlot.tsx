@@ -9,15 +9,15 @@ import AddBox from "../components/svg/AddBox";
 const useStyles = createUseStyles({
 	root: {
 		display: "flex",
-		flexDirection: "column",
 		alignItems: "center",
-		justifyContent: "center",
+		justifyContent: "flex-start",
 		padding: "1em",
 		fontSize: 16,
 		cursor: "pointer",
 	},
 	text: {
-		marginTop: "0.5em",
+		width: "100%",
+		marginLeft: "0.5em",
 	},
 });
 
