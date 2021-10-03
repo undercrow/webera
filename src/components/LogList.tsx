@@ -2,6 +2,7 @@ import {h} from "preact";
 
 import classNames from "classnames";
 import type {FunctionComponent} from "preact";
+import {useEffect, useRef} from "preact/hooks";
 import {createUseStyles} from "react-jss";
 
 import Block from "../components/Block";
@@ -13,7 +14,9 @@ const useStyles = createUseStyles({
 	root: {
 		...sx.vflex,
 		alignItems: "stretch",
+		justifyContent: "flex-start",
 		fontSize: 16,
+		overflowY: "scroll",
 	},
 });
 
@@ -25,9 +28,15 @@ const LogList: FunctionComponent<Props> = (props) => {
 	const {className} = props;
 	const styles = useStyles();
 	const blocks = useSelector(selectBlocks);
+	const bodyRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+		bodyRef.current?.scrollTo(0, bodyRef.current?.scrollHeight);
+	}, [blocks]);
 
 	return (
-		<div className={classNames([styles.root, className])}>
+		<div className={classNames([styles.root, className])} ref={bodyRef}>
 			{blocks.map((block) => <Block block={block} />)}
 		</div>
 	);

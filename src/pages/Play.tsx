@@ -22,6 +22,9 @@ const useStyles = createUseStyles({
 		backgroundColor: "black",
 		color: "white",
 	},
+	spacer: {
+		flex: "1 1 auto",
+	},
 	body: {
 		width: "100%",
 		flex: "1 1 auto",
@@ -50,6 +53,7 @@ const Play: FunctionComponent = () => {
 
 	return (
 		<div className={styles.root}>
+			<div className={styles.spacer} />
 			<LogList className={styles.body} />
 			<Console className={styles.console} />
 		</div>
