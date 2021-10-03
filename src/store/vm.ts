@@ -2,7 +2,7 @@ import * as era from "erajs";
 import {createSelector} from "reselect";
 import {createAction, createReducer} from "typesafe-actions";
 
-import type {State as RootState} from "./index";
+import type {State as RootState, ThunkAction} from "./index";
 
 export type State = {
 	vm?: era.VM;
@@ -23,3 +23,40 @@ export const reducer = createReducer<State, Action>(initial, {
 		vm: action.payload,
 	}),
 });
+
+export function startVM(): ThunkAction<void> {
+	return (_dispatch, getState) => {
+		const vm = getState().vm.vm;
+		if (vm == null) {
+			return;
+		}
+
+		const runtime = vm.start();
+
+		let input: string = "";
+		while (true) {
+			const next = runtime.next(input);
+			input = "";
+			if (next.done === true) {
+				break;
+			}
+			switch (next.value.type) {
+				case "string": {
+					break;
+				}
+				case "button": {
+					break;
+				}
+				case "line": {
+					break;
+				}
+				case "clearline": {
+					break;
+				}
+				default: {
+					throw new Error(`${next.value.type} is not implemented yet`);
+				}
+			}
+		}
+	};
+}

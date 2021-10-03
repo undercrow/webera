@@ -20,6 +20,7 @@ export type ThunkDispatch = Thunk.ThunkDispatch<State, undefined, Action>;
 
 const reducer = combineReducers({
 	log: log.reducer,
+	vm: vm.reducer,
 });
 
 /* eslint-disable */

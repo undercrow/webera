@@ -60,10 +60,10 @@ const Root: FunctionComponent = () => {
 	const [selected, setSelected] = useState<number | null>(null);
 
 	const slots = [
+		useLocalStorage<Slot | null>("slot-0", null),
 		useLocalStorage<Slot | null>("slot-1", null),
 		useLocalStorage<Slot | null>("slot-2", null),
 		useLocalStorage<Slot | null>("slot-3", null),
-		useLocalStorage<Slot | null>("slot-4", null),
 	];
 
 	return (
