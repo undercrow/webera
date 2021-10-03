@@ -5,12 +5,11 @@ import type {FunctionComponent} from "preact";
 import {createUseStyles} from "react-jss";
 
 import AddBox from "../components/svg/AddBox";
+import * as sx from "../style-util";
 
 const useStyles = createUseStyles({
 	root: {
-		display: "flex",
-		alignItems: "center",
-		justifyContent: "flex-start",
+		...sx.hflex,
 		padding: "1em",
 		fontSize: 16,
 	},

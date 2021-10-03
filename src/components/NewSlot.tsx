@@ -10,6 +10,7 @@ import * as era from "../era";
 import CheckCircle from "../components/svg/CheckCircle";
 import Sync from "../components/svg/Sync";
 import {Slot} from "../slot";
+import * as sx from "../style-util";
 
 const useStyles = createUseStyles({
 	"@keyframes spin": {
@@ -18,8 +19,7 @@ const useStyles = createUseStyles({
 		},
 	},
 	root: {
-		display: "flex",
-		alignItems: "center",
+		...sx.hflex,
 		justifyContent: "flex-start",
 		padding: "1em",
 		fontSize: 16,
@@ -28,17 +28,13 @@ const useStyles = createUseStyles({
 		animation: "$spin 2s linear infinite",
 	},
 	body: {
-		display: "flex",
-		flexDirection: "column",
+		...sx.vflex,
 		alignItems: "flex-start",
-		justifyContent: "center",
 		width: "100%",
 		marginRight: "0.5em",
 	},
 	label: {
-		display: "flex",
-		alignItems: "center",
-		justifyContent: "center",
+		...sx.hflex,
 		width: "100%",
 		marginBottom: "0.5em",
 	},

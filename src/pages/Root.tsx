@@ -7,6 +7,7 @@ import {createUseStyles} from "react-jss";
 import SlotComponent from "../components/Slot";
 import {useLocalStorage} from "../hooks";
 import {Slot} from "../slot";
+import * as sx from "../style-util";
 
 const useStyles = createUseStyles({
 	root: {
@@ -16,10 +17,7 @@ const useStyles = createUseStyles({
 		color: "white",
 	},
 	body: {
-		display: "flex",
-		flexDirection: "column",
-		alignItems: "center",
-		justifyContent: "center",
+		...sx.vflex,
 		width: "100%",
 		height: "100%",
 	},
@@ -35,10 +33,7 @@ const useStyles = createUseStyles({
 		lineHeight: "1.5em",
 	},
 	slotList: {
-		display: "flex",
-		flexDirection: "column",
-		alignItems: "center",
-		justifyContent: "center",
+		...sx.vflex,
 		width: "100%",
 		paddingLeft: "10rem",
 		paddingRight: "10rem",
