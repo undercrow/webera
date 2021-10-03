@@ -3,10 +3,13 @@ import {h} from "preact";
 import type {FunctionComponent} from "preact";
 import {useState} from "preact/hooks";
 import {createUseStyles} from "react-jss";
+import {useHistory} from "react-router";
 
 import SlotComponent from "../components/Slot";
 import {useLocalStorage} from "../hooks";
 import {Slot} from "../slot";
+import {useDispatch} from "../store";
+import {setVM} from "../store/vm";
 import * as sx from "../style-util";
 
 const useStyles = createUseStyles({
@@ -51,6 +54,8 @@ const useStyles = createUseStyles({
 });
 
 const Root: FunctionComponent = () => {
+	const history = useHistory();
+	const dispatch = useDispatch();
 	const styles = useStyles();
 	const [selected, setSelected] = useState<number | null>(null);
 
@@ -70,7 +75,9 @@ const Root: FunctionComponent = () => {
 					{slots.map(([slot, setSlot], i) => (
 						<li className={styles.slot}>
 							<SlotComponent
-								onCreate={(s) => setSlot(s)}
+								onCreate={(s) => { setSlot(s); setSelected(null); }}
+								onDelete={() => { setSlot(null); setSelected(null); }}
+								onPlay={(vm) => { dispatch(setVM(vm)); history.push(`/${i}`); }}
 								onSelect={() => setSelected(i)}
 								selected={i === selected}
 								slot={slot}

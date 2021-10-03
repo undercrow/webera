@@ -4,13 +4,16 @@ import thunk from "redux-thunk";
 import type * as Thunk from "redux-thunk";
 
 import * as log from "./log";
+import * as vm from "./vm";
 
 export type State = {
 	log: log.State;
+	vm: vm.State;
 };
 
 export type Action =
-	| log.Action;
+	| log.Action
+	| vm.Action;
 export type ThunkAction<R> = Thunk.ThunkAction<R, State, undefined, Action>;
 export type AsyncThunkAction<R> = Thunk.ThunkAction<Promise<R>, State, undefined, Action>;
 export type ThunkDispatch = Thunk.ThunkDispatch<State, undefined, Action>;
