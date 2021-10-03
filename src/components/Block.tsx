@@ -3,6 +3,7 @@ import {h} from "preact";
 import type {FunctionComponent} from "preact";
 import {createUseStyles} from "react-jss";
 
+import ButtonChunk from "../components/ButtonChunk";
 import LineChunk from "../components/LineChunk";
 import StringChunk from "../components/StringChunk";
 import * as sx from "../style-util";
@@ -28,9 +29,9 @@ const BlockComponent: FunctionComponent<Props> = (props) => {
 		<div className={styles.root}>
 			{block.chunks.map((chunk) => {
 				switch (chunk.type) {
+					case "button": return <ButtonChunk chunk={chunk} />;
 					case "line": return <LineChunk chunk={chunk} />;
 					case "string": return <StringChunk chunk={chunk} />;
-					default: return chunk.text;
 				}
 			})}
 		</div>

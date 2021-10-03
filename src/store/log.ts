@@ -1,7 +1,7 @@
 import {createSelector} from "reselect";
 import {createAction, createReducer} from "typesafe-actions";
 
-import {Block, LineChunk, StringChunk} from "../typings/chunk";
+import {Block, ButtonChunk, LineChunk, StringChunk} from "../typings/chunk";
 import {createSubReducer, State as RootState} from "./index";
 
 export type State = {
@@ -21,11 +21,13 @@ export const selector = (state: RootState): State => state.log;
 export const selectBlocks = createSelector(selector, (state) => state.blocks);
 
 export const pushNewline = createAction("LOG/BLOCK/PUSH/NEWLINE")();
+export const pushButton = createAction("LOG/BLOCK/PUSH/BUTTON")<Omit<ButtonChunk, "type">>();
 export const pushLine = createAction("LOG/BLOCK/PUSH/LINE")<Omit<LineChunk, "type">>();
 export const pushString = createAction("LOG/BLOCK/PUSH/STRING")<Omit<StringChunk, "type">>();
 
 export type Action =
 	| ReturnType<typeof pushNewline>
+	| ReturnType<typeof pushButton>
 	| ReturnType<typeof pushLine>
 	| ReturnType<typeof pushString>;
 export const reducer = createReducer<State, Action>(initial, {
@@ -48,6 +50,28 @@ export const reducer = createReducer<State, Action>(initial, {
 			chunks: [{type: "line", value}],
 			align: lastBlock.align,
 		});
+	}),
+	"LOG/BLOCK/PUSH/BUTTON": createSubReducer((state, action) => {
+		const {text, cell} = action.payload;
+
+		const lastBlock = state.blocks[state.blocks.length - 1];
+		const lastChunk = lastBlock.chunks[lastBlock.chunks.length - 1];
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+		switch (lastChunk?.type) {
+			case undefined:
+			case "line": {
+				state.blocks.push({
+					chunks: [{type: "string", text, cell}],
+					align: lastBlock.align,
+				});
+				break;
+			}
+			case "button":
+			case "string": {
+				lastBlock.chunks.push({type: "string", text, cell});
+				break;
+			}
+		}
 	}),
 	"LOG/BLOCK/PUSH/STRING": createSubReducer((state, action) => {
 		const {text, cell} = action.payload;
