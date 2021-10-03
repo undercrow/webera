@@ -9,8 +9,8 @@ import {createUseStyles} from "react-jss";
 import * as era from "../era";
 import CheckCircle from "../components/svg/CheckCircle";
 import Sync from "../components/svg/Sync";
-import {Slot} from "../slot";
 import * as sx from "../style-util";
+import {Slot} from "../typings/slot";
 
 const useStyles = createUseStyles({
 	"@keyframes spin": {

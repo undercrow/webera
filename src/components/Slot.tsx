@@ -7,7 +7,7 @@ import EmptySlot from "../components/EmptySlot";
 import NewSlot from "../components/NewSlot";
 import PlaySlot from "../components/PlaySlot";
 import ValidSlot from "../components/ValidSlot";
-import {Slot} from "../slot";
+import {Slot} from "../typings/slot";
 
 type Props = {
 	onCreate?: (slot: Slot) => void;

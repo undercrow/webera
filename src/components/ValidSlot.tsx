@@ -5,8 +5,8 @@ import {createUseStyles} from "react-jss";
 
 import Delete from "../components/svg/Delete";
 import PlayCircleFilled from "../components/svg/PlayCircleFilled";
-import {Slot} from "../slot";
 import * as sx from "../style-util";
+import {Slot} from "../typings/slot";
 
 const useStyles = createUseStyles({
 	root: {

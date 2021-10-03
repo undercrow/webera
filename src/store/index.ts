@@ -1,3 +1,4 @@
+import produce, {Draft} from "immer";
 import {useDispatch as rawUseDispatch, useSelector as rawUseSelector} from "react-redux";
 import {applyMiddleware, combineReducers, compose, createStore} from "redux";
 import thunk from "redux-thunk";
@@ -47,4 +48,9 @@ export function useDispatch(): Thunk.ThunkDispatch<State, undefined, Action> {
 
 export function useSelector<T>(selector: (state: State) => T): T {
 	return rawUseSelector(selector);
+}
+
+type SubReducer<S, A> = (state: Draft<S>, action: A) => void;
+export function createSubReducer<S, A>(fn: SubReducer<S, A>): (state: S, action: A) => S {
+	return (state: S, action: A) => produce(state, (s) => fn(s, action));
 }

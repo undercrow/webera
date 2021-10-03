@@ -10,8 +10,8 @@ import LogList from "../components/LogList";
 import {useLocalStorage} from "../hooks";
 import {useDispatch, useSelector} from "../store";
 import {selectVM, startVM} from "../store/vm";
-import {Slot} from "../slot";
 import * as sx from "../style-util";
+import {Slot} from "../typings/slot";
 
 const useStyles = createUseStyles({
 	root: {

@@ -7,10 +7,10 @@ import {useHistory} from "react-router";
 
 import SlotComponent from "../components/Slot";
 import {useLocalStorage} from "../hooks";
-import {Slot} from "../slot";
 import {useDispatch} from "../store";
 import {setVM} from "../store/vm";
 import * as sx from "../style-util";
+import {Slot} from "../typings/slot";
 
 const useStyles = createUseStyles({
 	root: {
