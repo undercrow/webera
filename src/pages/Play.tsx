@@ -2,20 +2,43 @@ import {h} from "preact";
 
 import type {FunctionComponent} from "preact";
 import {useEffect} from "preact/hooks";
+import {createUseStyles} from "react-jss";
 import {useHistory, useParams} from "react-router";
 
+import Console from "../components/Console";
+import LogList from "../components/LogList";
 import {useLocalStorage} from "../hooks";
 import {useDispatch, useSelector} from "../store";
 import {selectVM, startVM} from "../store/vm";
 import {Slot} from "../slot";
+import * as sx from "../style-util";
+
+const useStyles = createUseStyles({
+	root: {
+		...sx.vflex,
+		width: "100%",
+		height: "100%",
+		padding: "2rem",
+		backgroundColor: "black",
+		color: "white",
+	},
+	body: {
+		width: "100%",
+		flex: "1 1 auto",
+	},
+	console: {
+		width: "100%",
+	},
+});
 
 type Params = {
 	slot: string;
 };
 
-const Start: FunctionComponent = () => {
+const Play: FunctionComponent = () => {
 	const history = useHistory();
 	const dispatch = useDispatch();
+	const styles = useStyles();
 	const params = useParams<Params>();
 	const [slot] = useLocalStorage<Slot | null>(`slot-${params.slot}`, null);
 	const vm = useSelector(selectVM);
@@ -26,10 +49,11 @@ const Start: FunctionComponent = () => {
 	useEffect(() => dispatch(startVM()), []);
 
 	return (
-		<div>
-			Hello, World! (Start)
+		<div className={styles.root}>
+			<LogList className={styles.body} />
+			<Console className={styles.console} />
 		</div>
 	);
 };
 
-export default Start;
+export default Play;

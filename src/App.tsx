@@ -3,8 +3,8 @@ import {h} from "preact";
 import type {FunctionComponent} from "preact";
 import {Redirect, Route, Switch} from "react-router-dom";
 
+import Play from "./pages/Play";
 import Root from "./pages/Root";
-import Start from "./pages/Start";
 
 const App: FunctionComponent = () => (
 	<Switch>
@@ -12,7 +12,7 @@ const App: FunctionComponent = () => (
 			<Root />
 		</Route>
 		<Route exact path="/:slot">
-			<Start />
+			<Play />
 		</Route>
 		<Route path="*">
 			<Redirect to="/" />

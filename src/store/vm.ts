@@ -2,10 +2,12 @@ import * as era from "erajs";
 import {createSelector} from "reselect";
 import {createAction, createReducer} from "typesafe-actions";
 
+import Channel from "../channel";
 import type {State as RootState, ThunkAction} from "./index";
 
 export type State = {
 	vm?: era.VM;
+	channel?: Channel<string>;
 };
 
 const initial: State = {};
@@ -21,13 +23,25 @@ export const reducer = createReducer<State, Action>(initial, {
 	"VM/SET": (state, action) => ({
 		...state,
 		vm: action.payload,
+		channel: new Channel(),
 	}),
 });
 
-export function startVM(): ThunkAction<void> {
+export function pushInput(value: string): ThunkAction<void> {
 	return (_dispatch, getState) => {
-		const vm = getState().vm.vm;
-		if (vm == null) {
+		const channel = getState().vm.channel;
+		if (channel == null) {
+			return;
+		}
+
+		channel.push(value);
+	};
+}
+
+export function startVM(): ThunkAction<void> {
+	return async (_dispatch, getState) => {
+		const {vm, channel} = getState().vm;
+		if (vm == null || channel == null) {
 			return;
 		}
 
@@ -51,6 +65,14 @@ export function startVM(): ThunkAction<void> {
 					break;
 				}
 				case "clearline": {
+					break;
+				}
+				case "input": {
+					input = await channel.pop();
+					break;
+				}
+				case "wait": {
+					input = await channel.pop();
 					break;
 				}
 				default: {
