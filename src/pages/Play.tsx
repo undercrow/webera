@@ -9,7 +9,7 @@ import Console from "../components/Console";
 import LogList from "../components/LogList";
 import {useLocalStorage} from "../hooks";
 import {useDispatch, useSelector} from "../store";
-import {selectVM, startVM} from "../store/vm";
+import {selectVM, setSlot, startVM} from "../store/vm";
 import * as sx from "../style-util";
 import {Slot} from "../typings/slot";
 
@@ -49,7 +49,10 @@ const Play: FunctionComponent = () => {
 		history.push("/");
 	}
 
-	useEffect(() => dispatch(startVM()), []);
+	useEffect(() => {
+		dispatch(setSlot(params.slot));
+		dispatch(startVM());
+	}, []);
 
 	return (
 		<div className={styles.root}>

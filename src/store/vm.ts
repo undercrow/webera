@@ -3,7 +3,7 @@ import {createSelector} from "reselect";
 import {createAction, createReducer} from "typesafe-actions";
 
 import Channel from "../channel";
-import type {State as RootState, ThunkAction} from "./index";
+import {State as RootState, ThunkAction} from "./index";
 import {pushButton, pushLine, pushNewline, pushString, setAlign} from "./log";
 
 export type State = {
@@ -17,15 +17,38 @@ export const selector = (state: RootState): State => state.vm;
 export const selectVM = createSelector(selector, (state) => state.vm);
 
 export const setVM = createAction("VM/SET")<era.VM>();
+export const setSlot = createAction("VM/SLOT/SET")<string>();
 
 export type Action =
-	| ReturnType<typeof setVM>;
+	| ReturnType<typeof setVM>
+	| ReturnType<typeof setSlot>;
 export const reducer = createReducer<State, Action>(initial, {
 	"VM/SET": (state, action) => ({
 		...state,
 		vm: action.payload,
 		channel: new Channel(),
 	}),
+	"VM/SLOT/SET": (state, action) => {
+		const storageKey = "slot-" + action.payload + "-storage";
+		if (localStorage.getItem(storageKey) == null) {
+			localStorage.setItem(storageKey, JSON.stringify({}));
+		}
+		state.vm!.storage = {
+			get: (key) => JSON.parse(localStorage.getItem(storageKey)!)[key],
+			set: (key, value) => {
+				const storage = JSON.parse(localStorage.getItem(storageKey)!);
+				storage[key] = value;
+				localStorage.setItem(storageKey, JSON.stringify(storage));
+			},
+			del: (key) => {
+				const storage = JSON.parse(localStorage.getItem(storageKey)!);
+				delete storage[key];
+				localStorage.setItem(storageKey, JSON.stringify(storage));
+			},
+		};
+
+		return state;
+	},
 });
 
 export function pushInput(value: string): ThunkAction<void> {
