@@ -14,6 +14,7 @@ const useStyles = createUseStyles({
 	root: {
 		...sx.hflex,
 		alignItems: "stretch",
+		flexWrap: "wrap",
 		fontSize: 16,
 	},
 	leftAlign: {
