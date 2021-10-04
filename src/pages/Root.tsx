@@ -31,7 +31,7 @@ const useStyles = createUseStyles({
 	},
 	subtitle: {
 		marginBottom: "1em",
-		fontSize: 24,
+		fontSize: 20,
 		fontWeight: "normal",
 		lineHeight: "1.5em",
 	},
@@ -70,7 +70,7 @@ const Root: FunctionComponent = () => {
 		<div className={styles.root}>
 			<div className={styles.body}>
 				<h1 className={styles.title}>WebEra v2021.10.01</h1>
-				<h2 className={styles.subtitle}>eraJS v0.1.0</h2>
+				<h2 className={styles.subtitle}>- Made by Undercrow -</h2>
 				<ul className={styles.slotList}>
 					{slots.map(([slot, setSlot], i) => (
 						<li className={styles.slot}>
