@@ -12,7 +12,7 @@ function parseChunk(chunk: StringChunk): (ButtonChunk | StringChunk)[] {
 	const {text, cell} = chunk;
 	const result: (ButtonChunk | StringChunk)[] = [];
 
-	const buttonMatch = [...text.matchAll(/\s*\[(?<value>\d+)\]\s*/g)];
+	const buttonMatch = [...text.matchAll(/\s*\[\s*(?<value>\d+)\s*\]\s*/g)];
 	if (buttonMatch.length === 0) {
 		return [chunk];
 	}
