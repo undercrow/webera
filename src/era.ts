@@ -12,7 +12,8 @@ export async function compile(zip: JSZip): Promise<era.VM> {
 		} else if (name.startsWith("ERB/") && (name.endsWith(".erb") || name.endsWith(".ERB"))) {
 			erb.push(await zipObj.async("text"));
 		} else if (name.startsWith("CSV/") && (name.endsWith(".csv") || name.endsWith(".CSV"))) {
-			data.set(name.slice("CSV/".length), await zipObj.async("text"));
+			const baseName = name.split("/").pop()!;
+			data.set(baseName, await zipObj.async("text"));
 		}
 	}
 
