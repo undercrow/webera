@@ -1,5 +1,6 @@
 import {h} from "preact";
 
+import classnames from "classnames";
 import type {FunctionComponent} from "preact";
 import {createUseStyles} from "react-jss";
 
@@ -11,7 +12,6 @@ import {ButtonChunk} from "../typings/chunk";
 
 const useStyles = createUseStyles({
 	root: {
-		width: "100%",
 		minHeight: "1em",
 		fontSize: 16,
 		lineHeight: 1.6,
@@ -21,6 +21,16 @@ const useStyles = createUseStyles({
 		"&:hover": {
 			color: "yellow",
 		},
+	},
+	leftAlign: {
+		width: "10em",
+		justifyContent: "flex-start",
+		textAlign: "left",
+	},
+	rightAlign: {
+		width: "10em",
+		justifyContent: "flex-end",
+		textAlign: "right",
 	},
 });
 
@@ -38,6 +48,13 @@ const ButtonChunkComponent: FunctionComponent<Props> = (props) => {
 		dispatch(refreshTextified());
 	};
 
+	let alignStyle: string;
+	switch (chunk.cell) {
+		case "LEFT": alignStyle = styles.leftAlign; break;
+		case "RIGHT": alignStyle = styles.rightAlign; break;
+		default: alignStyle = ""; break;
+	}
+
 	if (textified === true) {
 		return (
 			<StringChunk
@@ -47,7 +64,7 @@ const ButtonChunkComponent: FunctionComponent<Props> = (props) => {
 		);
 	} else {
 		return (
-			<button className={styles.root} onClick={onClick}>
+			<button className={classnames(styles.root, alignStyle)} onClick={onClick}>
 				{chunk.text}
 			</button>
 		);

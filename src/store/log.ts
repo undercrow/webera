@@ -24,6 +24,7 @@ export const selectBlocks = createSelector(selector, (state) => state.blocks);
 export const selectTextified = createSelector(selector, (state) => state.textified);
 
 export const refreshTextified = createAction("LOG/BLOCK/TEXTIFY/REFRESH")();
+export const setAlign = createAction("LOG/BLOCK/ALIGN")<Block["align"]>();
 export const pushNewline = createAction("LOG/BLOCK/PUSH/NEWLINE")();
 export const pushButton = createAction("LOG/BLOCK/PUSH/BUTTON")<Omit<ButtonChunk, "type">>();
 export const pushLine = createAction("LOG/BLOCK/PUSH/LINE")<Omit<LineChunk, "type">>();
@@ -31,6 +32,7 @@ export const pushString = createAction("LOG/BLOCK/PUSH/STRING")<Omit<StringChunk
 
 export type Action =
 	| ReturnType<typeof refreshTextified>
+	| ReturnType<typeof setAlign>
 	| ReturnType<typeof pushNewline>
 	| ReturnType<typeof pushButton>
 	| ReturnType<typeof pushLine>
@@ -38,6 +40,9 @@ export type Action =
 export const reducer = createReducer<State, Action>(initial, {
 	"LOG/BLOCK/TEXTIFY/REFRESH": createSubReducer((state) => {
 		state.textified = state.blocks.length - 1;
+	}),
+	"LOG/BLOCK/ALIGN": createSubReducer((state, action) => {
+		state.blocks[state.blocks.length - 1].align = action.payload;
 	}),
 	"LOG/BLOCK/PUSH/NEWLINE": createSubReducer((state) => {
 		const align = state.blocks[state.blocks.length - 1].align;

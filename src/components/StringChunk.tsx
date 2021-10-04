@@ -1,5 +1,6 @@
 import {h, Fragment} from "preact";
 
+import classnames from "classnames";
 import type {FunctionComponent} from "preact";
 import {createUseStyles} from "react-jss";
 
@@ -59,6 +60,16 @@ const useStyles = createUseStyles({
 		fontSize: 16,
 		lineHeight: 1.6,
 	},
+	leftAlign: {
+		width: "10em",
+		justifyContent: "flex-start",
+		textAlign: "left",
+	},
+	rightAlign: {
+		width: "10em",
+		justifyContent: "flex-end",
+		textAlign: "right",
+	},
 });
 
 type Props = {
@@ -70,15 +81,22 @@ const StringChunkComponent: FunctionComponent<Props> = (props) => {
 	const {chunk, textified} = props;
 	const styles = useStyles();
 
+	let alignStyle: string;
+	switch (chunk.cell) {
+		case "LEFT": alignStyle = styles.leftAlign; break;
+		case "RIGHT": alignStyle = styles.rightAlign; break;
+		default: alignStyle = ""; break;
+	}
+
 	if (textified) {
-		return <span className={styles.root}>{chunk.text}</span>;
+		return <span className={classnames(styles.root, alignStyle)}>{chunk.text}</span>;
 	} else {
 		return (
 			<Fragment>
 				{parseChunk(chunk).map((c) => {
 					switch (c.type) {
 						case "button": return <ButtonChunkComponent chunk={c} />;
-						case "string": return <span className={styles.root}>{c.text}</span>;
+						case "string": return <StringChunkComponent textified chunk={chunk} />;
 					}
 				})}
 			</Fragment>
