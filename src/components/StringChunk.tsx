@@ -61,12 +61,12 @@ const useStyles = createUseStyles({
 		lineHeight: 1.6,
 	},
 	leftAlign: {
-		minWidth: "10em",
+		minWidth: "15em",
 		justifyContent: "flex-start",
 		textAlign: "left",
 	},
 	rightAlign: {
-		minWidth: "10em",
+		minWidth: "15em",
 		justifyContent: "flex-end",
 		textAlign: "right",
 	},

@@ -23,12 +23,12 @@ const useStyles = createUseStyles({
 		},
 	},
 	leftAlign: {
-		minWidth: "10em",
+		minWidth: "15em",
 		justifyContent: "flex-start",
 		textAlign: "left",
 	},
 	rightAlign: {
-		minWidth: "10em",
+		minWidth: "15em",
 		justifyContent: "flex-end",
 		textAlign: "right",
 	},
