@@ -33,16 +33,12 @@ export const reducer = createReducer<State, Action>(initial, {
 		if (localStorage.getItem(storageKey) == null) {
 			localStorage.setItem(storageKey, JSON.stringify({}));
 		}
-		state.vm!.storage = {
-			get: (key) => JSON.parse(localStorage.getItem(storageKey)!)[key],
-			set: (key, value) => {
+		state.vm!.external = {
+			getFont: () => false,
+			getGlobal: (key) => JSON.parse(localStorage.getItem(storageKey)!)[key],
+			setGlobal: (key, value) => {
 				const storage = JSON.parse(localStorage.getItem(storageKey)!);
 				storage[key] = value;
-				localStorage.setItem(storageKey, JSON.stringify(storage));
-			},
-			del: (key) => {
-				const storage = JSON.parse(localStorage.getItem(storageKey)!);
-				delete storage[key];
 				localStorage.setItem(storageKey, JSON.stringify(storage));
 			},
 		};
@@ -80,15 +76,15 @@ export function startVM(): ThunkAction<void> {
 			}
 			dispatch(setAlign(vm.alignment));
 			switch (next.value.type) {
+				case "newline": {
+					dispatch(pushNewline());
+					break;
+				}
 				case "string": {
-					if (next.value.text === "\n") {
-						dispatch(pushNewline());
-					} else {
-						dispatch(pushString({
-							text: next.value.text,
-							cell: next.value.cell,
-						}));
-					}
+					dispatch(pushString({
+						text: next.value.text,
+						cell: next.value.cell,
+					}));
 					break;
 				}
 				case "button": {
