@@ -9,6 +9,7 @@ import {pushButton, pushLine, pushNewline, pushString, setAlign} from "./log";
 export type State = {
 	vm?: era.VM;
 	channel?: Channel<string>;
+	slot?: string;
 };
 
 const initial: State = {};
@@ -28,23 +29,10 @@ export const reducer = createReducer<State, Action>(initial, {
 		vm: action.payload,
 		channel: new Channel(),
 	}),
-	"VM/SLOT/SET": (state, action) => {
-		const storageKey = "slot-" + action.payload + "-storage";
-		if (localStorage.getItem(storageKey) == null) {
-			localStorage.setItem(storageKey, JSON.stringify({}));
-		}
-		state.vm!.external = {
-			getFont: () => false,
-			getGlobal: (key) => JSON.parse(localStorage.getItem(storageKey)!)[key],
-			setGlobal: (key, value) => {
-				const storage = JSON.parse(localStorage.getItem(storageKey)!);
-				storage[key] = value;
-				localStorage.setItem(storageKey, JSON.stringify(storage));
-			},
-		};
-
-		return state;
-	},
+	"VM/SLOT/SET": (state, action) => ({
+		...state,
+		slot: action.payload,
+	}),
 });
 
 export function pushInput(value: string): ThunkAction<void> {
@@ -60,12 +48,20 @@ export function pushInput(value: string): ThunkAction<void> {
 
 export function startVM(): ThunkAction<void> {
 	return async (dispatch, getState) => {
-		const {vm, channel} = getState().vm;
-		if (vm == null || channel == null) {
+		const {vm, channel, slot} = getState().vm;
+		if (vm == null || channel == null || slot == null) {
 			return;
 		}
 
-		const runtime = vm.start();
+		const storagePrefix = "slot-" + slot + "/";
+		const runtime = vm.start({
+			getSavedata: (key) => localStorage.getItem(storagePrefix + key) ?? undefined,
+			setSavedata: (key, value) => {
+				localStorage.setItem(storagePrefix + key, value);
+			},
+			getFont: () => false,
+			getTime: () => new Date().valueOf(),
+		});
 
 		let input: string = "";
 		while (true) {
