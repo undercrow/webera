@@ -1,4 +1,6 @@
 import * as era from "erajs";
+import * as base64 from "js-base64";
+import * as pako from "pako";
 import {createSelector} from "reselect";
 import {createAction, createReducer} from "typesafe-actions";
 
@@ -55,9 +57,21 @@ export function startVM(): ThunkAction<void> {
 
 		const storagePrefix = "slot-" + slot + "/";
 		const runtime = vm.start({
-			getSavedata: (key) => localStorage.getItem(storagePrefix + key) ?? undefined,
+			getSavedata: (key) => {
+				const raw = localStorage.getItem(storagePrefix + key + ".gz");
+				if (raw == null) {
+					return undefined;
+				}
+
+				const decoded = base64.toUint8Array(raw);
+				const uncompressed = pako.ungzip(decoded, {to: "string"});
+
+				return uncompressed;
+			},
 			setSavedata: (key, value) => {
-				localStorage.setItem(storagePrefix + key, value);
+				const compressed = pako.gzip(value);
+				const encoded = base64.fromUint8Array(compressed);
+				localStorage.setItem(storagePrefix + key + ".gz", encoded);
 			},
 			getFont: () => false,
 			getTime: () => new Date().valueOf(),
