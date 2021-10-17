@@ -2,16 +2,18 @@ import * as era from "erajs";
 import JSZip from "jszip";
 
 export async function extract(zip: JSZip): Promise<Map<string, string>> {
-	const csvDir = Object.values(zip.files).find(
-		(zipObj) => zipObj.dir && zipObj.name.split("/").shift()?.toUpperCase() === "CSV",
-	);
+	const csvDir = Object.values(zip.files).find((zipObj) => zipObj.dir && (
+		zipObj.name.toUpperCase().endsWith("/CSV") ||
+		zipObj.name.toUpperCase().endsWith("/CSV/")
+	));
 	if (csvDir == null) {
 		throw new Error("CSV folder is not found");
 	}
 
-	const erbDir = Object.values(zip.files).find(
-		(zipObj) => zipObj.dir && zipObj.name.split("/").shift()?.toUpperCase() === "ERB",
-	);
+	const erbDir = Object.values(zip.files).find((zipObj) => zipObj.dir && (
+		zipObj.name.toUpperCase().endsWith("/ERB") ||
+		zipObj.name.toUpperCase().endsWith("/ERB/")
+	));
 	if (erbDir == null) {
 		throw new Error("ERB folder is not found");
 	}
