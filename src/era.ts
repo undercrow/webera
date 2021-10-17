@@ -1,35 +1,38 @@
 import * as era from "erajs";
 import JSZip from "jszip";
 
-export async function compile(zip: JSZip): Promise<era.VM> {
+export async function extract(zip: JSZip): Promise<Map<string, string>> {
+	const csvDir = Object.values(zip.files).find(
+		(zipObj) => zipObj.dir && zipObj.name.split("/").shift()?.toUpperCase() === "CSV",
+	);
+	if (csvDir == null) {
+		throw new Error("CSV folder is not found");
+	}
+
+	const erbDir = Object.values(zip.files).find(
+		(zipObj) => zipObj.dir && zipObj.name.split("/").shift()?.toUpperCase() === "ERB",
+	);
+	if (erbDir == null) {
+		throw new Error("ERB folder is not found");
+	}
+
 	const files = new Map<string, string>();
 	await Promise.all(Object.values(zip.files).map(async (zipObj) => {
-		const name = zipObj.name;
-		if (
-			(name.startsWith("ERB/") && (name.endsWith(".erh") || name.endsWith(".ERH"))) ||
-			(name.startsWith("ERB/") && (name.endsWith(".erb") || name.endsWith(".ERB"))) ||
-			(name.startsWith("CSV/") && (name.endsWith(".csv") || name.endsWith(".CSV")))
-		) {
-			files.set(name.split("/").pop()!, await zipObj.async("text"));
+		if (!zipObj.name.startsWith(csvDir.name) && !zipObj.name.startsWith(erbDir.name)) {
+			return;
 		}
+
+		files.set(zipObj.name.split("/").pop()!, await zipObj.async("text"));
 	}));
 
+	return files;
+}
+
+export function compile(files: Map<string, string>): era.VM {
 	return era.compile(files);
 }
 
-export async function hash(zip: JSZip): Promise<string> {
-	const files = new Map<string, string>();
-	await Promise.all(Object.values(zip.files).map(async (zipObj) => {
-		const name = zipObj.name;
-		if (
-			(name.startsWith("ERB/") && (name.endsWith(".erh") || name.endsWith(".ERH"))) ||
-			(name.startsWith("ERB/") && (name.endsWith(".erb") || name.endsWith(".ERB"))) ||
-			(name.startsWith("CSV/") && (name.endsWith(".csv") || name.endsWith(".CSV")))
-		) {
-			files.set(name, await zipObj.async("text"));
-		}
-	}));
-
+export async function hash(files: Map<string, string>): Promise<string> {
 	const keys = [...files.keys()];
 	keys.sort();
 	let content = "";

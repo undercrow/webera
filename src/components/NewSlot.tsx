@@ -97,7 +97,8 @@ const NewSlot: FunctionComponent<Props> = (props) => {
 
 			const buffer = await file.arrayBuffer();
 			const zip = await loadAsync(buffer);
-			const hash = await era.hash(zip);
+			const files = await era.extract(zip);
+			const hash = await era.hash(files);
 			setError(null);
 			onCreate?.({name, hash});
 		} catch (e) {
