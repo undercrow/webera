@@ -2,22 +2,19 @@ import * as era from "erajs";
 import JSZip from "jszip";
 
 export async function compile(zip: JSZip): Promise<era.VM> {
-	const erh: string[] = [];
-	const erb: string[] = [];
-	const data = new Map<string, string>();
+	const files = new Map<string, string>();
 	await Promise.all(Object.values(zip.files).map(async (zipObj) => {
 		const name = zipObj.name;
-		if (name.startsWith("ERB/") && (name.endsWith(".erh") || name.endsWith(".ERH"))) {
-			erh.push(await zipObj.async("text"));
-		} else if (name.startsWith("ERB/") && (name.endsWith(".erb") || name.endsWith(".ERB"))) {
-			erb.push(await zipObj.async("text"));
-		} else if (name.startsWith("CSV/") && (name.endsWith(".csv") || name.endsWith(".CSV"))) {
-			const baseName = name.split("/").pop()!;
-			data.set(baseName, await zipObj.async("text"));
+		if (
+			(name.startsWith("ERB/") && (name.endsWith(".erh") || name.endsWith(".ERH"))) ||
+			(name.startsWith("ERB/") && (name.endsWith(".erb") || name.endsWith(".ERB"))) ||
+			(name.startsWith("CSV/") && (name.endsWith(".csv") || name.endsWith(".CSV")))
+		) {
+			files.set(name.split("/").pop()!, await zipObj.async("text"));
 		}
 	}));
 
-	return era.compile(erh, erb, data);
+	return era.compile(files);
 }
 
 export async function hash(zip: JSZip): Promise<string> {

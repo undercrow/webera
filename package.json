@@ -12,7 +12,7 @@
 	},
 	"dependencies": {
 		"classnames": "^2.3.1",
-		"erajs": "https://github.com/undercrow/eraJS.git#v0.3.1",
+		"erajs": "https://github.com/undercrow/eraJS.git#v0.4.0",
 		"immer": "^9.0.6",
 		"js-base64": "^3.7.2",
 		"jszip": "^3.7.1",
