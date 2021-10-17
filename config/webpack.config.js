@@ -1,5 +1,6 @@
 "use strict";
 
+const DefinePlugin = require("webpack").DefinePlugin;
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -21,6 +22,8 @@ const ENTRY_PATH = path.join(SRC_PATH, "index.tsx");
 const PUBLIC_PATH = path.join(ROOT_PATH, "public");
 const BUILD_PATH = path.join(ROOT_PATH, "build");
 
+const BASENAME = isProd ? "/webera" : "";
+
 module.exports = {
 	mode: isProd ? "production": "development",
 	entry: ENTRY_PATH,
@@ -28,7 +31,7 @@ module.exports = {
 		path: BUILD_PATH,
 		filename: "js/[name].[contenthash:8].js",
 		chunkFilename: "js/[name].[contenthash:8].chunk.js",
-		publicPath: "/",
+		publicPath: BASENAME,
 	},
 	module: {
 		strictExportPresence: true,
@@ -100,6 +103,9 @@ module.exports = {
 		new MiniCssExtractPlugin({
 			filename: "css/[name].[contenthash:8].css",
 			chunkFilename: "css/[name].[contenthash:8].chunk.css",
+		}),
+		new DefinePlugin({
+			BASENAME: JSON.stringify(BASENAME),
 		}),
 	],
 	devtool: onDev("eval-source-map"),

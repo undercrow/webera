@@ -5,6 +5,7 @@
 	"version": "0.1.0",
 	"description": "Web implementation of Emuera",
 	"scripts": {
+		"build": "NODE_ENV=production webpack -c config/webpack.config.js",
 		"start": "webpack serve -c config/webpack.config.js",
 		"lint": "run-s lint:tsc lint:eslint",
 		"lint:tsc": "tsc -p . --noEmit",

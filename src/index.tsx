@@ -11,7 +11,7 @@ import App from "./App";
 
 render((
 	<ReduxProvider store={store}>
-		<Router>
+		<Router basename={BASENAME}>
 			<App />
 		</Router>
 	</ReduxProvider>

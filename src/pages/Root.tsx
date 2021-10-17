@@ -69,7 +69,7 @@ const Root: FunctionComponent = () => {
 	return (
 		<div className={styles.root}>
 			<div className={styles.body}>
-				<h1 className={styles.title}>WebEra v2021.10.01</h1>
+				<h1 className={styles.title}>WebEra v2021.10.17</h1>
 				<h2 className={styles.subtitle}>- Made by Undercrow -</h2>
 				<ul className={styles.slotList}>
 					{slots.map(([slot, setSlot], i) => (
