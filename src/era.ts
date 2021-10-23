@@ -3,6 +3,8 @@ import JSZip from "jszip";
 
 export async function extract(zip: JSZip): Promise<Map<string, string>> {
 	const csvDir = Object.values(zip.files).find((zipObj) => zipObj.dir && (
+		zipObj.name.toUpperCase() === "CSV" ||
+		zipObj.name.toUpperCase() === "CSV/" ||
 		zipObj.name.toUpperCase().endsWith("/CSV") ||
 		zipObj.name.toUpperCase().endsWith("/CSV/")
 	));
@@ -11,6 +13,8 @@ export async function extract(zip: JSZip): Promise<Map<string, string>> {
 	}
 
 	const erbDir = Object.values(zip.files).find((zipObj) => zipObj.dir && (
+		zipObj.name.toUpperCase() === "ERB" ||
+		zipObj.name.toUpperCase() === "ERB/" ||
 		zipObj.name.toUpperCase().endsWith("/ERB") ||
 		zipObj.name.toUpperCase().endsWith("/ERB/")
 	));
