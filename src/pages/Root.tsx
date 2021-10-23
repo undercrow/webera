@@ -14,15 +14,11 @@ import {Slot} from "../typings/slot";
 
 const useStyles = createUseStyles({
 	root: {
+		...sx.vflex,
 		width: "100%",
 		height: "100%",
 		backgroundColor: "black",
 		color: "white",
-	},
-	body: {
-		...sx.vflex,
-		width: "100%",
-		height: "100%",
 	},
 	title: {
 		fontSize: 34,
@@ -68,24 +64,22 @@ const Root: FunctionComponent = () => {
 
 	return (
 		<div className={styles.root}>
-			<div className={styles.body}>
-				<h1 className={styles.title}>WebEra v2021.10.17</h1>
-				<h2 className={styles.subtitle}>- Made by Undercrow -</h2>
-				<ul className={styles.slotList}>
-					{slots.map(([slot, setSlot], i) => (
-						<li className={styles.slot}>
-							<SlotComponent
-								onCreate={(s) => { setSlot(s); setSelected(null); }}
-								onDelete={() => { setSlot(null); setSelected(null); }}
-								onPlay={(vm) => { dispatch(setVM(vm)); history.push(`/${i}`); }}
-								onSelect={() => setSelected(i)}
-								selected={i === selected}
-								slot={slot}
-							/>
-						</li>
-					))}
-				</ul>
-			</div>
+			<h1 className={styles.title}>WebEra v2021.10.17</h1>
+			<h2 className={styles.subtitle}>- Made by Undercrow -</h2>
+			<ul className={styles.slotList}>
+				{slots.map(([slot, setSlot], i) => (
+					<li className={styles.slot}>
+						<SlotComponent
+							onCreate={(s) => { setSlot(s); setSelected(null); }}
+							onDelete={() => { setSlot(null); setSelected(null); }}
+							onPlay={(vm) => { dispatch(setVM(vm)); history.push(`/${i}`); }}
+							onSelect={() => setSelected(i)}
+							selected={i === selected}
+							slot={slot}
+						/>
+					</li>
+				))}
+			</ul>
 		</div>
 	);
 };
