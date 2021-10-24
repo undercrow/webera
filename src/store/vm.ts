@@ -111,19 +111,21 @@ export function startVM(): ThunkAction<void> {
 					}));
 					break;
 				}
-				case "clearline": {
+				case "clear": {
+					// TODO
 					break;
 				}
 				case "input": {
 					input = await channel.pop();
 					break;
 				}
-				case "wait": {
+				case "tinput": {
 					input = await channel.pop();
 					break;
 				}
-				default: {
-					throw new Error(`${next.value.type} is not implemented yet`);
+				case "wait": {
+					input = await channel.pop();
+					break;
 				}
 			}
 		}
