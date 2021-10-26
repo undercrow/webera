@@ -43,6 +43,25 @@ export const reducer = createReducer<State, Action>(initial, {
 	}),
 });
 
+export function skipWait(): ThunkAction<void> {
+	return async (_dispatch, getState) => {
+		const channel = runtime.channel;
+		if (channel == null) {
+			return;
+		}
+
+		while (true) {
+			const request = selectRequest(getState());
+			if (request == null || request.type !== "wait" || request.force) {
+				break;
+			}
+
+			channel.push(null);
+			await channel.flush();
+		}
+	};
+}
+
 export function pushInput(value: string | null): ThunkAction<void> {
 	return (_dispatch, getState) => {
 		const request = selectRequest(getState());

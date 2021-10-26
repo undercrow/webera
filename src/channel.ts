@@ -1,27 +1,41 @@
 export default class Channel<T> {
 	private queue: T[];
-	private resolve?: (value: T) => void;
+	private resolvePop?: (value: T) => void;
+	private resolveFlush?: () => void;
 
 	public constructor() {
 		this.queue = [];
 	}
 
 	public push(value: T): void {
-		if (this.resolve == null) {
+		if (this.resolvePop == null) {
 			this.queue.push(value);
 		} else {
-			this.resolve(value);
-			this.resolve = undefined;
+			this.resolvePop(value);
+			this.resolvePop = undefined;
 		}
 	}
 
 	public async pop(): Promise<T> {
 		if (this.queue.length !== 0) {
+			if (this.queue.length === 1 && this.resolveFlush != null) {
+				this.resolveFlush();
+			}
 			return this.queue.pop()!;
-		} else {
-			return new Promise<T>((res) => {
-				this.resolve = res;
-			});
 		}
+
+		return new Promise<T>((res) => {
+			this.resolvePop = res;
+		});
+	}
+
+	public async flush() {
+		if (this.queue.length === 0) {
+			return;
+		}
+
+		return new Promise<void>((res) => {
+			this.resolveFlush = res;
+		});
 	}
 }
