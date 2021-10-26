@@ -8,7 +8,7 @@ import {useHistory} from "react-router";
 import SlotComponent from "../components/Slot";
 import {useLocalStorage} from "../hooks";
 import {useDispatch} from "../store";
-import {setVM} from "../store/vm";
+import {setSlot as setSlotAction, startVM} from "../store/vm";
 import * as sx from "../style-util";
 import {Slot} from "../typings/slot";
 
@@ -72,7 +72,11 @@ const Root: FunctionComponent = () => {
 						<SlotComponent
 							onCreate={(s) => { setSlot(s); setSelected(null); }}
 							onDelete={() => { setSlot(null); setSelected(null); }}
-							onPlay={(vm) => { dispatch(setVM(vm)); history.push(`/${i}`); }}
+							onPlay={(vm) => {
+								dispatch(setSlotAction(i.toString()));
+								dispatch(startVM(vm, i.toString()));
+								history.push(`/${i}`);
+							}}
 							onSelect={() => setSelected(i)}
 							selected={i === selected}
 							slot={slot}

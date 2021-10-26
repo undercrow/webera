@@ -1,7 +1,6 @@
 import * as era from "erajs";
 import * as base64 from "js-base64";
 import * as pako from "pako";
-import {createSelector} from "reselect";
 import {createAction, createReducer} from "typesafe-actions";
 
 import Channel from "../channel";
@@ -9,28 +8,23 @@ import {State as RootState, ThunkAction} from "./index";
 import {pushButton, pushLine, pushNewline, pushString, setAlign} from "./log";
 
 export type State = {
-	vm?: era.VM;
-	channel?: Channel<string>;
 	slot?: string;
+};
+type Runtime = {
+	vm?: era.VM;
+	channel?: Channel<string | null>;
 };
 
 const initial: State = {};
+const runtime: Runtime = {};
 
 export const selector = (state: RootState): State => state.vm;
-export const selectVM = createSelector(selector, (state) => state.vm);
 
-export const setVM = createAction("VM/SET")<era.VM>();
 export const setSlot = createAction("VM/SLOT/SET")<string>();
 
 export type Action =
-	| ReturnType<typeof setVM>
 	| ReturnType<typeof setSlot>;
 export const reducer = createReducer<State, Action>(initial, {
-	"VM/SET": (state, action) => ({
-		...state,
-		vm: action.payload,
-		channel: new Channel(),
-	}),
 	"VM/SLOT/SET": (state, action) => ({
 		...state,
 		slot: action.payload,
@@ -38,8 +32,8 @@ export const reducer = createReducer<State, Action>(initial, {
 });
 
 export function pushInput(value: string): ThunkAction<void> {
-	return (_dispatch, getState) => {
-		const channel = getState().vm.channel;
+	return () => {
+		const channel = runtime.channel;
 		if (channel == null) {
 			return;
 		}
@@ -48,15 +42,13 @@ export function pushInput(value: string): ThunkAction<void> {
 	};
 }
 
-export function startVM(): ThunkAction<void> {
-	return async (dispatch, getState) => {
-		const {vm, channel, slot} = getState().vm;
-		if (vm == null || channel == null || slot == null) {
-			return;
-		}
+export function startVM(vm: era.VM, slot: string): ThunkAction<void> {
+	return async (dispatch) => {
+		runtime.vm = vm;
+		runtime.channel = new Channel();
 
 		const storagePrefix = "slot-" + slot + "/";
-		const runtime = vm.start({
+		const iterator = vm.start({
 			getSavedata: (key) => {
 				const raw = localStorage.getItem(storagePrefix + key + ".gz");
 				if (raw == null) {
@@ -77,10 +69,10 @@ export function startVM(): ThunkAction<void> {
 			getTime: () => new Date().valueOf(),
 		});
 
-		let input: string = "";
+		let input: string | null = null;
 		while (true) {
-			const next = runtime.next(input);
-			input = "";
+			const next = iterator.next(input);
+			input = null;
 			if (next.done === true) {
 				break;
 			}
@@ -116,15 +108,15 @@ export function startVM(): ThunkAction<void> {
 					break;
 				}
 				case "input": {
-					input = await channel.pop();
+					input = await runtime.channel.pop();
 					break;
 				}
 				case "tinput": {
-					input = await channel.pop();
+					input = await runtime.channel.pop();
 					break;
 				}
 				case "wait": {
-					input = await channel.pop();
+					await runtime.channel.pop();
 					break;
 				}
 			}
