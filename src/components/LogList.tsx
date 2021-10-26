@@ -6,8 +6,9 @@ import {useEffect, useRef} from "preact/hooks";
 import {createUseStyles} from "react-jss";
 
 import Block from "../components/Block";
-import {useSelector} from "../store";
+import {useDispatch, useSelector} from "../store";
 import {selectBlocks, selectTextified} from "../store/log";
+import {pushInput} from "../store/vm";
 import * as sx from "../style-util";
 
 const useStyles = createUseStyles({
@@ -26,6 +27,7 @@ type Props = {
 
 const LogList: FunctionComponent<Props> = (props) => {
 	const {className} = props;
+	const dispatch = useDispatch();
 	const styles = useStyles();
 	const blocks = useSelector(selectBlocks);
 	const textified = useSelector(selectTextified);
@@ -36,8 +38,10 @@ const LogList: FunctionComponent<Props> = (props) => {
 		bodyRef.current?.scrollTo(0, bodyRef.current?.scrollHeight);
 	}, [blocks]);
 
+	const onClick = () => dispatch(pushInput(null));
+
 	return (
-		<div className={classNames([styles.root, className])} ref={bodyRef}>
+		<div className={classNames([styles.root, className])} ref={bodyRef} onClick={onClick}>
 			{blocks.map((block, i) => <Block textified={textified >= i} block={block} />)}
 		</div>
 	);

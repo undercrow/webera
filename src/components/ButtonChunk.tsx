@@ -43,9 +43,10 @@ const ButtonChunkComponent: FunctionComponent<Props> = (props) => {
 	const {chunk, textified} = props;
 	const dispatch = useDispatch();
 	const styles = useStyles();
-	const onClick = () => {
+	const onClick = (event: MouseEvent) => {
 		dispatch(pushInput(chunk.value));
 		dispatch(refreshTextified());
+		event.stopPropagation();
 	};
 
 	let alignStyle: string;

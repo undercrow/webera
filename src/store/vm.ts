@@ -1,13 +1,15 @@
 import * as era from "erajs";
 import * as base64 from "js-base64";
 import * as pako from "pako";
+import {createSelector} from "reselect";
 import {createAction, createReducer} from "typesafe-actions";
 
 import Channel from "../channel";
-import {State as RootState, ThunkAction} from "./index";
+import {createSubReducer, State as RootState, ThunkAction} from "./index";
 import {pushButton, pushLine, pushNewline, pushString, setAlign} from "./log";
 
 export type State = {
+	request?: era.Output;
 	slot?: string;
 };
 type Runtime = {
@@ -19,26 +21,68 @@ const initial: State = {};
 const runtime: Runtime = {};
 
 export const selector = (state: RootState): State => state.vm;
+const selectRequest = createSelector(selector, (state) => state.request);
 
+const delRequest = createAction("VM/REQUEST/DEL")();
+const setRequest = createAction("VM/REQUEST/SET")<era.Output>();
 export const setSlot = createAction("VM/SLOT/SET")<string>();
 
 export type Action =
+	| ReturnType<typeof delRequest>
+	| ReturnType<typeof setRequest>
 	| ReturnType<typeof setSlot>;
 export const reducer = createReducer<State, Action>(initial, {
-	"VM/SLOT/SET": (state, action) => ({
-		...state,
-		slot: action.payload,
+	"VM/REQUEST/DEL": createSubReducer((state) => {
+		state.request = undefined;
+	}),
+	"VM/REQUEST/SET": createSubReducer((state, action) => {
+		state.request = action.payload;
+	}),
+	"VM/SLOT/SET": createSubReducer((state, action) => {
+		state.slot = action.payload;
 	}),
 });
 
-export function pushInput(value: string): ThunkAction<void> {
-	return () => {
+export function pushInput(value: string | null): ThunkAction<void> {
+	return (_dispatch, getState) => {
+		const request = selectRequest(getState());
 		const channel = runtime.channel;
-		if (channel == null) {
+		if (channel == null || request == null) {
 			return;
 		}
 
-		channel.push(value);
+		switch (request.type) {
+			case "wait": {
+				channel.push(null);
+				break;
+			}
+			case "input": {
+				if (request.numeric) {
+					if (value != null && !isNaN(Number(value))) {
+						channel.push(value);
+					}
+				} else {
+					if (value != null) {
+						channel.push(value);
+					}
+				}
+				break;
+			}
+			case "tinput": {
+				// TODO
+				if (request.numeric) {
+					if (value != null && !isNaN(Number(value))) {
+						channel.push(value);
+					}
+				} else {
+					if (value != null) {
+						channel.push(value);
+					}
+				}
+				break;
+			}
+			default: return;
+		}
 	};
 }
 
@@ -46,6 +90,7 @@ export function startVM(vm: era.VM, slot: string): ThunkAction<void> {
 	return async (dispatch) => {
 		runtime.vm = vm;
 		runtime.channel = new Channel();
+		dispatch(delRequest());
 
 		const storagePrefix = "slot-" + slot + "/";
 		const iterator = vm.start({
@@ -108,14 +153,17 @@ export function startVM(vm: era.VM, slot: string): ThunkAction<void> {
 					break;
 				}
 				case "input": {
+					dispatch(setRequest(next.value));
 					input = await runtime.channel.pop();
 					break;
 				}
 				case "tinput": {
+					dispatch(setRequest(next.value));
 					input = await runtime.channel.pop();
 					break;
 				}
 				case "wait": {
+					dispatch(setRequest(next.value));
 					await runtime.channel.pop();
 					break;
 				}
