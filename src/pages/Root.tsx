@@ -31,6 +31,10 @@ const useStyles = createUseStyles({
 		fontWeight: "normal",
 		lineHeight: "1.5em",
 	},
+	link: {
+		color: "skyblue !important",
+		textDecoration: "underline !important",
+	},
 	slotList: {
 		...sx.vflex,
 		width: "100%",
@@ -65,7 +69,9 @@ const Root: FunctionComponent = () => {
 	return (
 		<div className={styles.root}>
 			<h1 className={styles.title}>WebEra v2021.10.17</h1>
-			<h2 className={styles.subtitle}>- Made by Undercrow -</h2>
+			<h2 className={styles.subtitle}>
+				- Created by <a className={styles.link} href="https://github.com/undercrow">Undercrow</a> -
+			</h2>
 			<ul className={styles.slotList}>
 				{slots.map(([slot, setSlot], i) => (
 					<li className={styles.slot}>
