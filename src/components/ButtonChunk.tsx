@@ -44,7 +44,7 @@ const ButtonChunkComponent: FunctionComponent<Props> = (props) => {
 	const dispatch = useDispatch();
 	const styles = useStyles();
 	const onClick = (event: MouseEvent) => {
-		dispatch(pushInput(chunk.value));
+		dispatch(pushInput({type: "normal", value: chunk.value}));
 		dispatch(refreshTextified());
 		event.stopPropagation();
 	};

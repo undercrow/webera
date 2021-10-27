@@ -8,7 +8,7 @@ import {createUseStyles} from "react-jss";
 import Block from "../components/Block";
 import {useDispatch, useSelector} from "../store";
 import {selectBlocks, selectTextified} from "../store/log";
-import {pushInput, skipWait} from "../store/vm";
+import {pushInput} from "../store/vm";
 import * as sx from "../style-util";
 
 const useStyles = createUseStyles({
@@ -38,9 +38,9 @@ const LogList: FunctionComponent<Props> = (props) => {
 		bodyRef.current?.scrollTo(0, bodyRef.current?.scrollHeight);
 	}, [blocks]);
 
-	const onClick = () => dispatch(pushInput(null));
+	const onClick = () => dispatch(pushInput({type: "pass"}));
 	const onContextMenu = (event: Event) => {
-		dispatch(skipWait());
+		dispatch(pushInput({type: "skip"}));
 		event.preventDefault();
 	};
 

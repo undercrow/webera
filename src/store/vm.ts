@@ -4,112 +4,61 @@ import * as pako from "pako";
 import {createSelector} from "reselect";
 import {createAction, createReducer} from "typesafe-actions";
 
-import Channel from "../channel";
 import {createSubReducer, State as RootState, ThunkAction} from "./index";
 import {pushButton, pushLine, pushNewline, pushString, setAlign} from "./log";
 
+type Input =
+	| {type: "normal"; value: string}
+	| {type: "pass"}
+	| {type: "skip"};
+
+let inputCallback: (() => void) | undefined;
 export type State = {
-	request?: era.Output;
+	inputs: Input[];
 	slot?: string;
 };
-type Runtime = {
-	vm?: era.VM;
-	channel?: Channel<string | null>;
-};
 
-const initial: State = {};
-const runtime: Runtime = {};
+const initial: State = {
+	inputs: [],
+};
+let vm: era.VM | undefined;
 
 export const selector = (state: RootState): State => state.vm;
-const selectRequest = createSelector(selector, (state) => state.request);
+const selectInput = createSelector(selector, (state) => state.inputs[0] as Input | undefined);
 
-const delRequest = createAction("VM/REQUEST/DEL")();
-const setRequest = createAction("VM/REQUEST/SET")<era.Output>();
+export const pushInput = createAction("VM/INPUT/PUSH")<Input>();
+const shiftInput = createAction("VM/INPUT/SHIFT")();
+const clearInput = createAction("VM/INPUT/CLEAR")();
 export const setSlot = createAction("VM/SLOT/SET")<string>();
 
 export type Action =
-	| ReturnType<typeof delRequest>
-	| ReturnType<typeof setRequest>
+	| ReturnType<typeof pushInput>
+	| ReturnType<typeof shiftInput>
+	| ReturnType<typeof clearInput>
 	| ReturnType<typeof setSlot>;
 export const reducer = createReducer<State, Action>(initial, {
-	"VM/REQUEST/DEL": createSubReducer((state) => {
-		state.request = undefined;
+	"VM/INPUT/PUSH": createSubReducer((state, action) => {
+		state.inputs.push(action.payload);
+		if (inputCallback != null) {
+			inputCallback();
+			inputCallback = undefined;
+		}
 	}),
-	"VM/REQUEST/SET": createSubReducer((state, action) => {
-		state.request = action.payload;
+	"VM/INPUT/SHIFT": createSubReducer((state) => {
+		state.inputs.shift();
+	}),
+	"VM/INPUT/CLEAR": createSubReducer((state) => {
+		state.inputs = [];
 	}),
 	"VM/SLOT/SET": createSubReducer((state, action) => {
 		state.slot = action.payload;
 	}),
 });
 
-export function skipWait(): ThunkAction<void> {
-	return async (_dispatch, getState) => {
-		const channel = runtime.channel;
-		if (channel == null) {
-			return;
-		}
-
-		while (true) {
-			const request = selectRequest(getState());
-			if (request == null || request.type !== "wait" || request.force) {
-				break;
-			}
-
-			channel.push(null);
-			await channel.flush();
-		}
-	};
-}
-
-export function pushInput(value: string | null): ThunkAction<void> {
-	return (_dispatch, getState) => {
-		const request = selectRequest(getState());
-		const channel = runtime.channel;
-		if (channel == null || request == null) {
-			return;
-		}
-
-		switch (request.type) {
-			case "wait": {
-				channel.push(null);
-				break;
-			}
-			case "input": {
-				if (request.numeric) {
-					if (value != null && !isNaN(Number(value))) {
-						channel.push(value);
-					}
-				} else {
-					if (value != null) {
-						channel.push(value);
-					}
-				}
-				break;
-			}
-			case "tinput": {
-				// TODO
-				if (request.numeric) {
-					if (value != null && !isNaN(Number(value))) {
-						channel.push(value);
-					}
-				} else {
-					if (value != null) {
-						channel.push(value);
-					}
-				}
-				break;
-			}
-			default: return;
-		}
-	};
-}
-
-export function startVM(vm: era.VM, slot: string): ThunkAction<void> {
-	return async (dispatch) => {
-		runtime.vm = vm;
-		runtime.channel = new Channel();
-		dispatch(delRequest());
+export function startVM(targetVM: era.VM, slot: string): ThunkAction<void> {
+	return async (dispatch, getState) => {
+		vm = targetVM;
+		dispatch(clearInput());
 
 		const storagePrefix = "slot-" + slot + "/";
 		const iterator = vm.start({
@@ -133,57 +82,119 @@ export function startVM(vm: era.VM, slot: string): ThunkAction<void> {
 			getTime: () => new Date().valueOf(),
 		});
 
-		let input: string | null = null;
+		let output = iterator.next(null);
 		while (true) {
-			const next = iterator.next(input);
-			input = null;
-			if (next.done === true) {
+			if (output.done === true) {
 				break;
 			}
+
 			dispatch(setAlign(vm.alignment));
-			switch (next.value.type) {
+			switch (output.value.type) {
 				case "newline": {
 					dispatch(pushNewline());
+					output = iterator.next(null);
 					break;
 				}
 				case "string": {
 					dispatch(pushString({
-						text: next.value.text,
-						cell: next.value.cell,
+						text: output.value.text,
+						cell: output.value.cell,
 					}));
-					break;
+					output = iterator.next(null);
+					continue;
 				}
 				case "button": {
 					dispatch(pushButton({
-						text: next.value.text,
-						value: next.value.value,
-						cell: next.value.cell,
+						text: output.value.text,
+						value: output.value.value,
+						cell: output.value.cell,
 					}));
-					break;
+					output = iterator.next(null);
+					continue;
 				}
 				case "line": {
 					dispatch(pushLine({
-						value: next.value.value,
+						value: output.value.value,
 					}));
-					break;
+					output = iterator.next(null);
+					continue;
 				}
 				case "clear": {
 					// TODO
-					break;
+					output = iterator.next(null);
+					continue;
 				}
 				case "input": {
-					dispatch(setRequest(next.value));
-					input = await runtime.channel.pop();
+					const input: Input | undefined = selectInput(getState());
+					if (input == null) {
+						await new Promise<void>((res) => { inputCallback = res; });
+						continue;
+					}
+
+					switch (input.type) {
+						case "skip": dispatch(shiftInput()); break;
+						case "pass": dispatch(shiftInput()); break;
+						case "normal": {
+							if (output.value.numeric) {
+								if (!isNaN(Number(input.value))) {
+									output = iterator.next(input.value);
+								}
+							} else {
+								output = iterator.next(input.value);
+							}
+							dispatch(shiftInput());
+						}
+					}
 					break;
 				}
 				case "tinput": {
-					dispatch(setRequest(next.value));
-					input = await runtime.channel.pop();
+					const input: Input | undefined = selectInput(getState());
+					if (input == null) {
+						await new Promise<void>((res) => { inputCallback = res; });
+						continue;
+					}
+
+					switch (input.type) {
+						case "skip": dispatch(shiftInput()); break;
+						case "pass": dispatch(shiftInput()); break;
+						case "normal": {
+							dispatch(shiftInput());
+							if (output.value.numeric) {
+								if (!isNaN(Number(input.value))) {
+									output = iterator.next(input.value);
+								}
+							} else {
+								output = iterator.next(input.value);
+							}
+						}
+					}
 					break;
 				}
 				case "wait": {
-					dispatch(setRequest(next.value));
-					await runtime.channel.pop();
+					const input: Input | undefined = selectInput(getState());
+					if (input == null) {
+						await new Promise<void>((res) => { inputCallback = res; });
+						continue;
+					}
+					switch (input.type) {
+						case "skip": {
+							if (output.value.force) {
+								dispatch(shiftInput());
+							}
+							output = iterator.next(null);
+							break;
+						}
+						case "pass": {
+							dispatch(shiftInput());
+							output = iterator.next(null);
+							break;
+						}
+						case "normal": {
+							dispatch(shiftInput());
+							output = iterator.next(null);
+							break;
+						}
+					}
 					break;
 				}
 			}

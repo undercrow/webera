@@ -50,7 +50,7 @@ const Console: FunctionComponent<Props> = (props) => {
 	const onSubmit = (event: Event) => {
 		event.preventDefault();
 		dispatch(refreshTextified());
-		dispatch(pushInput(value));
+		dispatch(pushInput({type: "normal", value}));
 		setValue("");
 	};
 	const inputRef = useRef<HTMLInputElement>(null);
