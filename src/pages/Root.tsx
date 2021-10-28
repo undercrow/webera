@@ -86,7 +86,7 @@ const Root: FunctionComponent = () => {
 
 	return (
 		<div className={styles.root}>
-			<h1 className={styles.title}>WebEra v2021.10.17</h1>
+			<h1 className={styles.title}>WebEra v2021.10.29</h1>
 			<h2 className={styles.subtitle}>
 				- Created by <a className={styles.link} href="https://github.com/undercrow">Undercrow</a> -
 			</h2>
