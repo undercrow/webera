@@ -1,14 +1,19 @@
 import {h} from "preact";
 
+import localforage from "localforage";
+import jszip from "jszip";
 import type {FunctionComponent} from "preact";
 import {createUseStyles} from "react-jss";
-import {useHistory, useParams} from "react-router";
+import {useParams} from "react-router";
 
 import Console from "../components/Console";
 import LogList from "../components/LogList";
-import {useLocalStorage} from "../hooks";
+import * as era from "../era";
+import {useAsyncEffect} from "../hooks";
+import {useDispatch} from "../store";
+import {startVM} from "../store/vm";
 import * as sx from "../style-util";
-import {Slot} from "../typings/slot";
+import Metadata from "../typings/metadata";
 
 const useStyles = createUseStyles({
 	root: {
@@ -36,13 +41,25 @@ type Params = {
 };
 
 const Play: FunctionComponent = () => {
-	const history = useHistory();
+	const dispatch = useDispatch();
 	const styles = useStyles();
 	const params = useParams<Params>();
-	const [slot] = useLocalStorage<Slot | null>(`slot-${params.slot}`, null);
-	if (slot == null) {
-		history.push("/");
-	}
+	useAsyncEffect(async () => {
+		const metadata = await localforage.getItem<Metadata>("metadata/" + params.slot);
+		if (metadata == null) {
+			throw new Error(`Metadata for slot ${params.slot} does not exist`);
+		}
+
+		const raw = await localforage.getItem<File>("files/" + params.slot);
+		if (raw == null) {
+			throw new Error(`File for slot ${params.slot} does not exist`);
+		}
+
+		const zip = await jszip.loadAsync(await raw.arrayBuffer());
+		const files = await era.extract(zip);
+		const vm = era.compile(files);
+		await dispatch(startVM(vm, metadata.slot));
+	}, [params.slot]);
 
 	return (
 		<div className={styles.root}>

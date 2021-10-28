@@ -1,16 +1,16 @@
 import {h} from "preact";
 
 import classNames from "classnames";
-import {loadAsync} from "jszip";
 import type {FunctionComponent} from "preact";
 import {useRef, useState} from "preact/hooks";
 import {createUseStyles} from "react-jss";
 
-import * as era from "../era";
 import CheckCircle from "../components/svg/CheckCircle";
 import Sync from "../components/svg/Sync";
+import {useSelector} from "../store";
+import {selectSlots} from "../store/slot";
 import * as sx from "../style-util";
-import {Slot} from "../typings/slot";
+import {Slot} from "../typings/metadata";
 
 const useStyles = createUseStyles({
 	"@keyframes spin": {
@@ -69,7 +69,7 @@ const useStyles = createUseStyles({
 
 type Props = {
 	className?: string;
-	onCreate?: (slot: Slot) => void;
+	onCreate?: (slot: Slot, file: File) => void | Promise<void>;
 };
 
 const NewSlot: FunctionComponent<Props> = (props) => {
@@ -78,32 +78,32 @@ const NewSlot: FunctionComponent<Props> = (props) => {
 	const [name, setName] = useState("");
 	const [error, setError] = useState<string | null>(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const slots = useSelector(selectSlots);
 	const fileRef = useRef<HTMLInputElement>(null);
 	const onSubmit = async () => {
 		if (isSubmitting) {
 			return;
 		}
 		setIsSubmitting(true);
-		try {
-			const file = fileRef.current!.files?.item(0);
+		const file = fileRef.current!.files?.item(0);
 
-			if (name === "") {
-				throw new Error("Please set the name of the slot");
-			} else if (file == null) {
-				throw new Error("Please specify the file for this slot");
-			} else if (file.type !== "application/zip") {
-				throw new Error("Only zip file is supported");
-			}
-
-			const buffer = await file.arrayBuffer();
-			const zip = await loadAsync(buffer);
-			const files = await era.extract(zip);
-			const hash = await era.hash(files);
-			setError(null);
-			onCreate?.({name, hash});
-		} catch (e) {
-			setError((e as Error).message);
+		if (name === "") {
+			setError("Please set the name of the slot");
+			return;
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+		} else if (slots[name] != null) {
+			setError(`Slot ${name} already exists`);
+			return;
+		} else if (file == null) {
+			setError("Please specify the file for this slot");
+			return;
+		} else if (file.type !== "application/zip") {
+			setError("Only zip files are supported");
+			return;
 		}
+
+		setError(null);
+		await onCreate?.({name}, file);
 		setIsSubmitting(false);
 	};
 

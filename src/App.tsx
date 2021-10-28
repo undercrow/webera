@@ -11,7 +11,7 @@ const App: FunctionComponent = () => (
 		<Route exact path="/">
 			<Root />
 		</Route>
-		<Route exact path="/:slot">
+		<Route exact path="/slot/:slot">
 			<Play />
 		</Route>
 		<Route path="*">

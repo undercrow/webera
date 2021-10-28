@@ -5,12 +5,14 @@ import {useState} from "preact/hooks";
 import {createUseStyles} from "react-jss";
 import {useHistory} from "react-router";
 
-import SlotComponent from "../components/Slot";
-import {useLocalStorage} from "../hooks";
-import {useDispatch} from "../store";
-import {setSlot as setSlotAction, startVM} from "../store/vm";
+import AddBox from "../components/svg/AddBox";
+import NewSlot from "../components/NewSlot";
+import ValidSlot from "../components/ValidSlot";
+import {useAsyncEffect} from "../hooks";
+import {useDispatch, useSelector} from "../store";
+import {createSlot, rehydrateSlots, removeSlot, selectSlots} from "../store/slot";
 import * as sx from "../style-util";
-import {Slot} from "../typings/slot";
+import {Slot} from "../typings/metadata";
 
 const useStyles = createUseStyles({
 	root: {
@@ -51,20 +53,36 @@ const useStyles = createUseStyles({
 			backgroundColor: "#0B0B0B",
 		},
 	},
+	new: {
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
+		width: "100%",
+		height: "100%",
+		padding: "1em",
+		cursor: "pointer",
+	},
 });
 
 const Root: FunctionComponent = () => {
 	const history = useHistory();
 	const dispatch = useDispatch();
 	const styles = useStyles();
-	const [selected, setSelected] = useState<number | null>(null);
 
-	const slots = [
-		useLocalStorage<Slot | null>("slot-0", null),
-		useLocalStorage<Slot | null>("slot-1", null),
-		useLocalStorage<Slot | null>("slot-2", null),
-		useLocalStorage<Slot | null>("slot-3", null),
-	];
+	const [isCreating, setIsCreating] = useState(false);
+	const slotMap = useSelector(selectSlots);
+
+	useAsyncEffect(() => dispatch(rehydrateSlots()), []);
+
+	const onPlay = (slot: Slot) => history.push("/slot/" + slot.name);
+	const onDelete = (slot: Slot) => dispatch(removeSlot(slot.name));
+	const onCreate = async (slot: Slot, file: File) => {
+		await dispatch(createSlot(slot, file));
+		setIsCreating(false);
+	};
+
+	const slotKeys = Object.keys(slotMap);
+	slotKeys.sort();
 
 	return (
 		<div className={styles.root}>
@@ -73,22 +91,19 @@ const Root: FunctionComponent = () => {
 				- Created by <a className={styles.link} href="https://github.com/undercrow">Undercrow</a> -
 			</h2>
 			<ul className={styles.slotList}>
-				{slots.map(([slot, setSlot], i) => (
+				{slotKeys.map((key) => (
 					<li className={styles.slot}>
-						<SlotComponent
-							onCreate={(s) => { setSlot(s); setSelected(null); }}
-							onDelete={() => { setSlot(null); setSelected(null); }}
-							onPlay={(vm) => {
-								dispatch(setSlotAction(i.toString()));
-								dispatch(startVM(vm, i.toString()));
-								history.push(`/${i}`);
-							}}
-							onSelect={() => setSelected(i)}
-							selected={i === selected}
-							slot={slot}
-						/>
+						<ValidSlot slot={slotMap[key]} onPlay={onPlay} onDelete={onDelete} />
 					</li>
 				))}
+				<li className={styles.slot}>
+					{isCreating ?
+						<NewSlot onCreate={onCreate} /> :
+						<div className={styles.new} onClick={() => setIsCreating(true)}>
+							<AddBox color="white" size={48} />
+						</div>
+					}
+				</li>
 			</ul>
 		</div>
 	);

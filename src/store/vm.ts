@@ -1,9 +1,10 @@
 import * as era from "erajs";
-import * as base64 from "js-base64";
-import * as pako from "pako";
+import localforage from "localforage";
+import pako from "pako";
 import {createSelector} from "reselect";
 import {createAction, createReducer} from "typesafe-actions";
 
+import {Slot} from "../typings/metadata";
 import {createSubReducer, State as RootState, ThunkAction} from "./index";
 import {pushButton, pushLine, pushNewline, pushString, setAlign} from "./log";
 
@@ -15,7 +16,6 @@ type Input =
 let inputCallback: (() => void) | undefined;
 export type State = {
 	inputs: Input[];
-	slot?: string;
 };
 
 const initial: State = {
@@ -29,13 +29,11 @@ const selectInput = createSelector(selector, (state) => state.inputs[0] as Input
 export const pushInput = createAction("VM/INPUT/PUSH")<Input>();
 const shiftInput = createAction("VM/INPUT/SHIFT")();
 const clearInput = createAction("VM/INPUT/CLEAR")();
-export const setSlot = createAction("VM/SLOT/SET")<string>();
 
 export type Action =
 	| ReturnType<typeof pushInput>
 	| ReturnType<typeof shiftInput>
-	| ReturnType<typeof clearInput>
-	| ReturnType<typeof setSlot>;
+	| ReturnType<typeof clearInput>;
 export const reducer = createReducer<State, Action>(initial, {
 	"VM/INPUT/PUSH": createSubReducer((state, action) => {
 		state.inputs.push(action.payload);
@@ -50,39 +48,31 @@ export const reducer = createReducer<State, Action>(initial, {
 	"VM/INPUT/CLEAR": createSubReducer((state) => {
 		state.inputs = [];
 	}),
-	"VM/SLOT/SET": createSubReducer((state, action) => {
-		state.slot = action.payload;
-	}),
 });
 
-export function startVM(targetVM: era.VM, slot: string): ThunkAction<void> {
+export function startVM(targetVM: era.VM, slot: Slot): ThunkAction<Promise<void>> {
 	return async (dispatch, getState) => {
 		vm = targetVM;
 		dispatch(clearInput());
 
-		const storagePrefix = "slot-" + slot + "/";
+		const storagePrefix = `save/${slot.name}/`;
 		const iterator = vm.start({
-			getSavedata: (key) => {
-				const raw = localStorage.getItem(storagePrefix + key + ".gz");
+			getSavedata: async (key) => {
+				const raw = await localforage.getItem<Uint8Array>(storagePrefix + key + ".gz");
 				if (raw == null) {
 					return undefined;
 				}
 
-				const decoded = base64.toUint8Array(raw);
-				const uncompressed = pako.ungzip(decoded, {to: "string"});
-
-				return uncompressed;
+				return pako.ungzip(raw, {to: "string"});
 			},
-			setSavedata: (key, value) => {
-				const compressed = pako.gzip(value);
-				const encoded = base64.fromUint8Array(compressed);
-				localStorage.setItem(storagePrefix + key + ".gz", encoded);
+			setSavedata: async (key, value) => {
+				await localforage.setItem(storagePrefix + key + ".gz", pako.gzip(value));
 			},
 			getFont: () => false,
 			getTime: () => new Date().valueOf(),
 		});
 
-		let output = iterator.next(null);
+		let output = await iterator.next(null);
 		while (true) {
 			if (output.done === true) {
 				break;
@@ -92,7 +82,7 @@ export function startVM(targetVM: era.VM, slot: string): ThunkAction<void> {
 			switch (output.value.type) {
 				case "newline": {
 					dispatch(pushNewline());
-					output = iterator.next(null);
+					output = await iterator.next(null);
 					break;
 				}
 				case "string": {
@@ -100,7 +90,7 @@ export function startVM(targetVM: era.VM, slot: string): ThunkAction<void> {
 						text: output.value.text,
 						cell: output.value.cell,
 					}));
-					output = iterator.next(null);
+					output = await iterator.next(null);
 					continue;
 				}
 				case "button": {
@@ -109,19 +99,19 @@ export function startVM(targetVM: era.VM, slot: string): ThunkAction<void> {
 						value: output.value.value,
 						cell: output.value.cell,
 					}));
-					output = iterator.next(null);
+					output = await iterator.next(null);
 					continue;
 				}
 				case "line": {
 					dispatch(pushLine({
 						value: output.value.value,
 					}));
-					output = iterator.next(null);
+					output = await iterator.next(null);
 					continue;
 				}
 				case "clear": {
 					// TODO
-					output = iterator.next(null);
+					output = await iterator.next(null);
 					continue;
 				}
 				case "input": {
@@ -137,10 +127,10 @@ export function startVM(targetVM: era.VM, slot: string): ThunkAction<void> {
 						case "normal": {
 							if (output.value.numeric) {
 								if (!isNaN(Number(input.value))) {
-									output = iterator.next(input.value);
+									output = await iterator.next(input.value);
 								}
 							} else {
-								output = iterator.next(input.value);
+								output = await iterator.next(input.value);
 							}
 							dispatch(shiftInput());
 						}
@@ -161,10 +151,10 @@ export function startVM(targetVM: era.VM, slot: string): ThunkAction<void> {
 							dispatch(shiftInput());
 							if (output.value.numeric) {
 								if (!isNaN(Number(input.value))) {
-									output = iterator.next(input.value);
+									output = await iterator.next(input.value);
 								}
 							} else {
-								output = iterator.next(input.value);
+								output = await iterator.next(input.value);
 							}
 						}
 					}
@@ -181,17 +171,17 @@ export function startVM(targetVM: era.VM, slot: string): ThunkAction<void> {
 							if (output.value.force) {
 								dispatch(shiftInput());
 							}
-							output = iterator.next(null);
+							output = await iterator.next(null);
 							break;
 						}
 						case "pass": {
 							dispatch(shiftInput());
-							output = iterator.next(null);
+							output = await iterator.next(null);
 							break;
 						}
 						case "normal": {
 							dispatch(shiftInput());
-							output = iterator.next(null);
+							output = await iterator.next(null);
 							break;
 						}
 					}

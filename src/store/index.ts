@@ -5,22 +5,25 @@ import thunk from "redux-thunk";
 import type * as Thunk from "redux-thunk";
 
 import * as log from "./log";
+import * as slot from "./slot";
 import * as vm from "./vm";
 
 export type State = {
 	log: log.State;
+	slot: slot.State;
 	vm: vm.State;
 };
 
 export type Action =
 	| log.Action
+	| slot.Action
 	| vm.Action;
 export type ThunkAction<R> = Thunk.ThunkAction<R, State, undefined, Action>;
-export type AsyncThunkAction<R> = Thunk.ThunkAction<Promise<R>, State, undefined, Action>;
 export type ThunkDispatch = Thunk.ThunkDispatch<State, undefined, Action>;
 
 const reducer = combineReducers({
 	log: log.reducer,
+	slot: slot.reducer,
 	vm: vm.reducer,
 });
 
