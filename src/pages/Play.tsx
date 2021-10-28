@@ -1,28 +1,33 @@
 import {h} from "preact";
 
-import localforage from "localforage";
-import jszip from "jszip";
 import type {FunctionComponent} from "preact";
 import {createUseStyles} from "react-jss";
-import {useParams} from "react-router";
+import {useHistory, useParams} from "react-router";
 
 import Console from "../components/Console";
 import LogList from "../components/LogList";
-import * as era from "../era";
+import ErrorPopup from "../components/ErrorPopup";
 import {useAsyncEffect} from "../hooks";
-import {useDispatch} from "../store";
-import {startVM} from "../store/vm";
+import {useDispatch, useSelector} from "../store";
+import {selectError, startVM} from "../store/vm";
 import * as sx from "../style-util";
-import Metadata from "../typings/metadata";
 
 const useStyles = createUseStyles({
 	root: {
 		...sx.vflex,
+		position: "relative",
 		width: "100%",
 		height: "100%",
 		padding: "2rem",
 		backgroundColor: "black",
 		color: "white",
+	},
+	popup: {
+		position: "absolute",
+		top: "50%",
+		left: "50%",
+		maxWidth: "50%",
+		transform: "translate(-50%, -50%)",
 	},
 	spacer: {
 		flex: "1 1 auto",
@@ -41,28 +46,22 @@ type Params = {
 };
 
 const Play: FunctionComponent = () => {
+	const history = useHistory();
 	const dispatch = useDispatch();
 	const styles = useStyles();
 	const params = useParams<Params>();
-	useAsyncEffect(async () => {
-		const metadata = await localforage.getItem<Metadata>("metadata/" + params.slot);
-		if (metadata == null) {
-			throw new Error(`Metadata for slot ${params.slot} does not exist`);
-		}
+	const error = useSelector(selectError);
 
-		const raw = await localforage.getItem<File>("files/" + params.slot);
-		if (raw == null) {
-			throw new Error(`File for slot ${params.slot} does not exist`);
-		}
-
-		const zip = await jszip.loadAsync(await raw.arrayBuffer());
-		const files = await era.extract(zip);
-		const vm = era.compile(files);
-		await dispatch(startVM(vm, metadata.slot));
-	}, [params.slot]);
+	useAsyncEffect(() => dispatch(startVM(params.slot)), [params.slot]);
+	const onBack = () => history.push("/");
+	const onRetry = () => dispatch(startVM(params.slot));
 
 	return (
 		<div className={styles.root}>
+			{error != null ?
+				<ErrorPopup className={styles.popup} error={error} onBack={onBack} onRetry={onRetry} /> :
+				null
+			}
 			<div className={styles.spacer} />
 			<LogList className={styles.body} />
 			<Console className={styles.console} />

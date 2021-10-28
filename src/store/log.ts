@@ -29,6 +29,7 @@ export const pushNewline = createAction("LOG/BLOCK/PUSH/NEWLINE")();
 export const pushButton = createAction("LOG/BLOCK/PUSH/BUTTON")<Omit<ButtonChunk, "type">>();
 export const pushLine = createAction("LOG/BLOCK/PUSH/LINE")<Omit<LineChunk, "type">>();
 export const pushString = createAction("LOG/BLOCK/PUSH/STRING")<Omit<StringChunk, "type">>();
+export const clearBlocks = createAction("LOG/BLOCK/CLEAR")();
 
 export type Action =
 	| ReturnType<typeof refreshTextified>
@@ -36,7 +37,8 @@ export type Action =
 	| ReturnType<typeof pushNewline>
 	| ReturnType<typeof pushButton>
 	| ReturnType<typeof pushLine>
-	| ReturnType<typeof pushString>;
+	| ReturnType<typeof pushString>
+	| ReturnType<typeof clearBlocks>;
 export const reducer = createReducer<State, Action>(initial, {
 	"LOG/BLOCK/TEXTIFY/REFRESH": createSubReducer((state) => {
 		state.textified = state.blocks.length - 1;
@@ -114,5 +116,14 @@ export const reducer = createReducer<State, Action>(initial, {
 				break;
 			}
 		}
+	}),
+	"LOG/BLOCK/CLEAR": createSubReducer((state) => {
+		state.blocks = [
+			{
+				chunks: [],
+				align: "LEFT",
+			},
+		];
+		state.textified = -1;
 	}),
 });
