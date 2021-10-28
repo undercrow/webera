@@ -51,7 +51,7 @@ const LogList: FunctionComponent<Props> = (props) => {
 			onClick={onClick}
 			onContextMenu={onContextMenu}
 		>
-			{blocks.map((block, i) => <Block textified={textified >= i} block={block} />)}
+			{blocks.map((block, i) => <Block key={i} textified={textified >= i} block={block} />)}
 		</div>
 	);
 };

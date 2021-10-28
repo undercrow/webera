@@ -1,6 +1,5 @@
 "use strict";
 
-const DefinePlugin = require("webpack").DefinePlugin;
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -103,9 +102,6 @@ module.exports = {
 		new MiniCssExtractPlugin({
 			filename: "css/[name].[contenthash:8].css",
 			chunkFilename: "css/[name].[contenthash:8].chunk.css",
-		}),
-		new DefinePlugin({
-			BASENAME: JSON.stringify(BASENAME),
 		}),
 	],
 	devtool: onDev("eval-source-map"),

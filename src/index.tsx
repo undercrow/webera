@@ -2,7 +2,7 @@ import {h} from "preact";
 
 import {render} from "preact";
 import {Provider as ReduxProvider} from "react-redux";
-import {HashRouter as Router} from "react-router-dom";
+import {HashRouter} from "react-router-dom";
 
 import "./reset.css";
 
@@ -11,8 +11,8 @@ import App from "./App";
 
 render((
 	<ReduxProvider store={store}>
-		<Router basename={BASENAME} hashType="noslash">
+		<HashRouter hashType="noslash">
 			<App />
-		</Router>
+		</HashRouter>
 	</ReduxProvider>
 ), document.getElementById("root")!);
