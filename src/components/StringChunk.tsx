@@ -24,6 +24,18 @@ const useStyles = createUseStyles({
 		justifyContent: "flex-end",
 		textAlign: "right",
 	},
+	bold: {
+		fontWeight: "bold",
+	},
+	italic: {
+		fontStyle: "italic",
+	},
+	underline: {
+		textDecoration: "underline",
+	},
+	color: (chunk: StringChunk) => ({
+		color: "#" + chunk.style.color,
+	}),
 });
 
 type Props = {
@@ -32,16 +44,30 @@ type Props = {
 
 const StringChunkComponent: FunctionComponent<Props> = (props) => {
 	const {chunk} = props;
-	const styles = useStyles();
+	const styles = useStyles(chunk);
 
-	let alignStyle: string;
+	const textStyles: string[] = [];
 	switch (chunk.cell) {
-		case "LEFT": alignStyle = styles.leftAlign; break;
-		case "RIGHT": alignStyle = styles.rightAlign; break;
-		default: alignStyle = ""; break;
+		case "LEFT": textStyles.push(styles.leftAlign); break;
+		case "RIGHT": textStyles.push(styles.rightAlign); break;
+		default: break;
 	}
+	if (chunk.style.bold) {
+		textStyles.push(styles.bold);
+	}
+	if (chunk.style.italic) {
+		textStyles.push(styles.italic);
+	}
+	if (chunk.style.underline) {
+		textStyles.push(styles.underline);
+	}
+	textStyles.push(styles.color);
 
-	return <span className={classnames(styles.root, alignStyle)}>{chunk.text}</span>;
+	return (
+		<span className={classnames(styles.root, ...textStyles)}>
+			{chunk.text}
+		</span>
+	);
 };
 
 export default StringChunkComponent;

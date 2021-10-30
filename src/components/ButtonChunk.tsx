@@ -17,10 +17,6 @@ const useStyles = createUseStyles({
 		lineHeight: 1.6,
 		color: "white",
 		cursor: "pointer",
-
-		"&:hover": {
-			color: "yellow",
-		},
 	},
 	leftAlign: {
 		minWidth: "15em",
@@ -32,6 +28,21 @@ const useStyles = createUseStyles({
 		justifyContent: "flex-end",
 		textAlign: "right",
 	},
+	bold: {
+		fontWeight: "bold",
+	},
+	italic: {
+		fontStyle: "italic",
+	},
+	underline: {
+		textDecoration: "underline",
+	},
+	color: (chunk: ButtonChunk) => ({
+		color: "#" + chunk.style.color,
+		"&:hover": {
+			color: "#" + chunk.style.focus,
+		},
+	}),
 });
 
 type Props = {
@@ -42,25 +53,35 @@ type Props = {
 const ButtonChunkComponent: FunctionComponent<Props> = (props) => {
 	const {chunk, textified} = props;
 	const dispatch = useDispatch();
-	const styles = useStyles();
+	const styles = useStyles(chunk);
 	const onClick = (event: MouseEvent) => {
 		dispatch(pushInput({type: "normal", value: chunk.value}));
 		dispatch(refreshTextified());
 		event.stopPropagation();
 	};
 
-	let alignStyle: string;
+	const textStyles: string[] = [];
 	switch (chunk.cell) {
-		case "LEFT": alignStyle = styles.leftAlign; break;
-		case "RIGHT": alignStyle = styles.rightAlign; break;
-		default: alignStyle = ""; break;
+		case "LEFT": textStyles.push(styles.leftAlign); break;
+		case "RIGHT": textStyles.push(styles.rightAlign); break;
+		default: break;
 	}
+	if (chunk.style.bold) {
+		textStyles.push(styles.bold);
+	}
+	if (chunk.style.italic) {
+		textStyles.push(styles.italic);
+	}
+	if (chunk.style.underline) {
+		textStyles.push(styles.underline);
+	}
+	textStyles.push(styles.color);
 
 	if (textified === true) {
 		return <StringChunk chunk={{...chunk, type: "string"}} />;
 	} else {
 		return (
-			<button className={classnames(styles.root, alignStyle)} onClick={onClick}>
+			<button className={classnames(styles.root, ...textStyles)} onClick={onClick}>
 				{chunk.text}
 			</button>
 		);
