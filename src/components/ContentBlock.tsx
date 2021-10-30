@@ -1,18 +1,18 @@
 import {h} from "preact";
 
 import classnames from "classnames";
+import {ContentOutput} from "erajs";
 import type {FunctionComponent} from "preact";
 import {createUseStyles} from "react-jss";
 
 import ButtonChunk from "../components/ButtonChunk";
-import LineChunk from "../components/LineChunk";
 import StringChunk from "../components/StringChunk";
 import * as sx from "../style-util";
-import {Block} from "../typings/chunk";
 
 const useStyles = createUseStyles({
 	root: {
 		...sx.hflex,
+		flexShrink: 0,
 		alignItems: "stretch",
 		flexWrap: "wrap",
 		fontSize: 16,
@@ -30,10 +30,10 @@ const useStyles = createUseStyles({
 
 type Props = {
 	textified: boolean;
-	block: Block;
+	block: ContentOutput;
 };
 
-const BlockComponent: FunctionComponent<Props> = (props) => {
+const ContentBlock: FunctionComponent<Props> = (props) => {
 	const {block, textified} = props;
 	const styles = useStyles();
 
@@ -46,15 +46,14 @@ const BlockComponent: FunctionComponent<Props> = (props) => {
 
 	return (
 		<div className={classnames(styles.root, alignStyle)}>
-			{block.chunks.map((chunk) => {
+			{block.children.map((chunk) => {
 				switch (chunk.type) {
 					case "button": return <ButtonChunk chunk={chunk} textified={textified} />;
-					case "line": return <LineChunk chunk={chunk} />;
-					case "string": return <StringChunk chunk={chunk} textified={textified} />;
+					case "string": return <StringChunk chunk={chunk} />;
 				}
 			})}
 		</div>
 	);
 };
 
-export default BlockComponent;
+export default ContentBlock;

@@ -5,7 +5,8 @@ import type {FunctionComponent} from "preact";
 import {useEffect, useRef} from "preact/hooks";
 import {createUseStyles} from "react-jss";
 
-import Block from "../components/Block";
+import ContentBlock from "../components/ContentBlock";
+import LineBlock from "../components/LineBlock";
 import {useDispatch, useSelector} from "../store";
 import {selectBlocks, selectTextified} from "../store/log";
 import {pushInput} from "../store/vm";
@@ -25,7 +26,7 @@ type Props = {
 	className?: string;
 };
 
-const LogList: FunctionComponent<Props> = (props) => {
+const BlockList: FunctionComponent<Props> = (props) => {
 	const {className} = props;
 	const dispatch = useDispatch();
 	const styles = useStyles();
@@ -51,9 +52,15 @@ const LogList: FunctionComponent<Props> = (props) => {
 			onClick={onClick}
 			onContextMenu={onContextMenu}
 		>
-			{blocks.map((block, i) => <Block key={i} textified={textified >= i} block={block} />)}
+			{blocks.map((block, i) => {
+				switch (block.type) {
+					case "content": return <ContentBlock key={i} textified={textified >= i} block={block} />;
+					case "line": return <LineBlock key={i} block={block} />;
+					default: return null;
+				}
+			})}
 		</div>
 	);
 };
 
-export default LogList;
+export default BlockList;

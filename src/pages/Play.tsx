@@ -4,8 +4,8 @@ import type {FunctionComponent} from "preact";
 import {createUseStyles} from "react-jss";
 import {useHistory, useParams} from "react-router";
 
+import BlockList from "../components/BlockList";
 import Console from "../components/Console";
-import LogList from "../components/LogList";
 import ErrorPopup from "../components/ErrorPopup";
 import {useAsyncEffect} from "../hooks";
 import {useDispatch, useSelector} from "../store";
@@ -63,7 +63,7 @@ const Play: FunctionComponent = () => {
 				null
 			}
 			<div className={styles.spacer} />
-			<LogList className={styles.body} />
+			<BlockList className={styles.body} />
 			<Console className={styles.console} />
 		</div>
 	);

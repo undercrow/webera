@@ -8,7 +8,7 @@ import {createAction, createReducer} from "typesafe-actions";
 import * as era from "../era";
 import Metadata from "../typings/metadata";
 import {createSubReducer, State as RootState, ThunkAction} from "./index";
-import {clearBlocks, pushButton, pushLine, pushNewline, pushString, setAlign} from "./log";
+import {clearBlocks, pushOutput} from "./log";
 
 type Input =
 	| {type: "normal"; value: string}
@@ -124,34 +124,14 @@ export function startVM(slot: string): ThunkAction<Promise<void>> {
 					break;
 				}
 
-				dispatch(setAlign(vm.alignment));
 				switch (output.value.type) {
-					case "newline": {
-						dispatch(pushNewline());
+					case "content": {
+						dispatch(pushOutput(output.value));
 						output = await iterator.next(null);
 						break;
 					}
-					case "string": {
-						dispatch(pushString({
-							text: output.value.text,
-							cell: output.value.cell,
-						}));
-						output = await iterator.next(null);
-						continue;
-					}
-					case "button": {
-						dispatch(pushButton({
-							text: output.value.text,
-							value: output.value.value,
-							cell: output.value.cell,
-						}));
-						output = await iterator.next(null);
-						continue;
-					}
 					case "line": {
-						dispatch(pushLine({
-							value: output.value.value,
-						}));
+						dispatch(pushOutput(output.value));
 						output = await iterator.next(null);
 						continue;
 					}

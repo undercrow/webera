@@ -1,6 +1,7 @@
 import {h} from "preact";
 
 import classnames from "classnames";
+import {ButtonChunk} from "erajs";
 import type {FunctionComponent} from "preact";
 import {createUseStyles} from "react-jss";
 
@@ -8,7 +9,6 @@ import StringChunk from "../components/StringChunk";
 import {useDispatch} from "../store";
 import {refreshTextified} from "../store/log";
 import {pushInput} from "../store/vm";
-import {ButtonChunk} from "../typings/chunk";
 
 const useStyles = createUseStyles({
 	root: {
@@ -57,12 +57,7 @@ const ButtonChunkComponent: FunctionComponent<Props> = (props) => {
 	}
 
 	if (textified === true) {
-		return (
-			<StringChunk
-				textified
-				chunk={{type: "string", text: chunk.text, cell: chunk.cell}}
-			/>
-		);
+		return <StringChunk chunk={{...chunk, type: "string"}} />;
 	} else {
 		return (
 			<button className={classnames(styles.root, alignStyle)} onClick={onClick}>
