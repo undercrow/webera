@@ -19,12 +19,12 @@ const useStyles = createUseStyles({
 		cursor: "pointer",
 	},
 	leftAlign: {
-		minWidth: "15em",
+		minWidth: "14em",
 		justifyContent: "flex-start",
 		textAlign: "left",
 	},
 	rightAlign: {
-		minWidth: "15em",
+		minWidth: "14em",
 		justifyContent: "flex-end",
 		textAlign: "right",
 	},
