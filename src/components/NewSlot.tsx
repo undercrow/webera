@@ -97,7 +97,11 @@ const NewSlot: FunctionComponent<Props> = (props) => {
 		} else if (file == null) {
 			setError("Please specify the file for this slot");
 			return;
-		} else if (file.type !== "application/zip") {
+		} else if (
+			file.type !== "application/zip" &&
+			file.type !== "application/x-zip" &&
+			file.type !== "application/x-zip-compressed"
+		) {
 			setError("Only zip files are supported");
 			return;
 		}
