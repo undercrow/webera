@@ -8,7 +8,7 @@ import {createAction, createReducer} from "typesafe-actions";
 import * as era from "../era";
 import Metadata from "../typings/metadata";
 import {createSubReducer, State as RootState, ThunkAction} from "./index";
-import {clearBlocks, pushOutput} from "./log";
+import {clearBlocks, popBlock, pushBlock} from "./log";
 
 type Input =
 	| {type: "normal"; value: string}
@@ -126,17 +126,17 @@ export function startVM(slot: string): ThunkAction<Promise<void>> {
 
 				switch (output.value.type) {
 					case "content": {
-						dispatch(pushOutput(output.value));
+						dispatch(pushBlock(output.value));
 						output = await iterator.next(null);
 						break;
 					}
 					case "line": {
-						dispatch(pushOutput(output.value));
+						dispatch(pushBlock(output.value));
 						output = await iterator.next(null);
 						continue;
 					}
 					case "clear": {
-						// TODO
+						dispatch(popBlock(output.value.count));
 						output = await iterator.next(null);
 						continue;
 					}

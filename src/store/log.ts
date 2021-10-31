@@ -19,12 +19,14 @@ export const selectBlocks = createSelector(selector, (state) => state.blocks);
 export const selectTextified = createSelector(selector, (state) => state.textified);
 
 export const refreshTextified = createAction("LOG/BLOCK/TEXTIFY/REFRESH")();
-export const pushOutput = createAction("LOG/BLOCK/PUSH")<Output>();
+export const pushBlock = createAction("LOG/BLOCK/PUSH")<Output>();
+export const popBlock = createAction("LOG/BLOCK/POP")<number>();
 export const clearBlocks = createAction("LOG/BLOCK/CLEAR")();
 
 export type Action =
 	| ReturnType<typeof refreshTextified>
-	| ReturnType<typeof pushOutput>
+	| ReturnType<typeof pushBlock>
+	| ReturnType<typeof popBlock>
 	| ReturnType<typeof clearBlocks>;
 export const reducer = createReducer<State, Action>(initial, {
 	"LOG/BLOCK/TEXTIFY/REFRESH": createSubReducer((state) => {
@@ -32,6 +34,11 @@ export const reducer = createReducer<State, Action>(initial, {
 	}),
 	"LOG/BLOCK/PUSH": createSubReducer((state, action) => {
 		state.blocks.push(action.payload);
+	}),
+	"LOG/BLOCK/POP": createSubReducer((state, action) => {
+		for (let i = 0; i < action.payload; ++i) {
+			state.blocks.pop();
+		}
 	}),
 	"LOG/BLOCK/CLEAR": createSubReducer((state) => {
 		state.blocks = [];
